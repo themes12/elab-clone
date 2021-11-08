@@ -1,0 +1,37 @@
+<tr class="{% cycle 'row1' 'row2' %}">
+
+  <td>
+    {{ inline_admin_form.form.number.errors.as_ul }}
+    {{ inline_admin_form.form.number }}
+    {{ inline_admin_form.form.id }}
+    {{ inline_admin_form.form.lab }}
+  </td>
+
+  <td>
+    {{ inline_admin_form.form.task }}
+    {% if inline_admin_form.original and inline_admin_form.original.task %}
+      <small>
+        [<a href="{% url 'cms:admin-cms-task-test' inline_admin_form.original.task.id %}" onclick="return showAddAnotherPopup(this);">try</a>]
+        [<a href="{% url 'admin:cms_task_change' inline_admin_form.original.task.id %}" target="_blank">edit</a>]
+      </small>
+    {% endif %}
+  </td>
+
+  <td style="text-align:left">
+    {{ inline_admin_form.form.submission_count }}
+  </td>
+
+    <td class="delete">
+    {% if inline_admin_form.form.can_delete %}
+      {% if inline_admin_form.original and inline_admin_form.original.id %}
+        {% if inline_admin_form.deletion_field.field %}
+          {{ inline_admin_form.deletion_field.field }}
+        {% else %}
+          {{ inline_admin_form.form.DELETE }}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+    </td>
+  
+</tr>
+

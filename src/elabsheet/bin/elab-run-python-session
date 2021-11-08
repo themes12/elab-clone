@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+    echo "Execute statements from a simple Python console session output."
+    echo "The script extracts and executes only lines starting with the >>> prompt."
+    echo
+    echo "Usage: $0 <python-session-log> [preamble files...]"
+    exit 1
+fi
+
+if [ -Z $PYTHON_EXEC ]; then
+    PYTHON_EXEC=python3.6
+fi
+
+log=$1
+shift
+tmp=$(mktemp /tmp/elab.python-session.XXXX)
+
+log_dir=$(cd $(dirname $log); pwd)
+
+if [ "$*" ]; then
+    cat $* > $tmp
+fi
+cat << EOF >> $tmp
+import sys
+sys.path.append("$log_dir")
+sys.ps1=''
+import code
+code.interact(banner='',exitmsg='',local=locals())
+EOF
+
+grep '^>>> ' $log | sed 's/>>> //' | $PYTHON_EXEC $tmp
+
+rm $tmp

@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="test.css" type="text/css" />
+แล็บชีตหมายเลข ๒
+==============
+เอกสารฉบับนี้แสดงตัวอย่างการใช้งานระบบ eLabsheet
+
+::elab:config lang='python',markers=('{{','}}')
+
+ส่วนของโปรแกรมกลุ่มแรก
+::elab:begincode hidden=True
+def hello():
+   print 'Hello, World'
+::elab:endcode
+
+ส่วนของโปรแกรมกลุ่มที่สอง
+::elab:begincode
+x = {{raw_input}}('What is your name?')
+print {{'Hello, %s'}} % {{x}}
+sum,prod = 0,1
+for x in range(100):
+   {{sum = sum + x}}
+   {{prod = prod*x}}
+   {{             }}
+{{                          }}
+{{                          }}
+{{                          }}
+ {{                        }}
+{{                          }}
+{{                          }}
+{{                          }}
+::elab:endcode
+
+::elab:begintest
+Arthur
+::elab:endtest
+
+::elab:begintest
+Hello, World
+Hi
+::elab:endtest

@@ -1,0 +1,20 @@
+{% load i18n %}
+
+{% comment %}
+  This is for assignment inline tabular form, used in django admin.
+  It is modified from standard django template tabular.html.  The main
+  chunk has be moved to "assignment_inline.html".  This template is
+  basically used to provide place holder for those inline forms.
+{% endcomment %}
+
+<div class="inline-group">
+  <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
+    <div id="assignment-inline-formset">
+
+      {# Placeholder for inline forms #}
+
+      {% include "admin/cms/lab/include/assignment_inline.html" %}
+
+    </div>
+  </div>
+</div>

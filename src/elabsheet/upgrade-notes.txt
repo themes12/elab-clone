@@ -1,0 +1,129 @@
+Upgrade notes
+=============
+
+Python 2 -> 3
+-------------
+* print function
+* Exception syntax
+* Floating-point division instead of integer
+* All Python3 strings are unicode
+* Octal literals must now be prefixed with 0o, e.g., 0o644 instead of 0644
+* Relative imports
+* dict's has_key() no longer exists.  Use 'in' instead.
+    d.has_key('key')  =>  'key' in d
+* Incompatibility of Python2's and Python3's pickle protocols
+* The 'L' suffix for a long integer is no longer needed, e.g., 16L -> 16
+* dict.iterkeys() no longer exists; use dict.keys() instead.
+* zip() returns an iterator.  Iterating over all elements will effectively
+  empty the result.
+* Tuple parameter unpacking for lambda is no longer available.  (See
+  https://www.python.org/dev/peps/pep-3113/)
+
+  Therefore, something like
+
+    lambda x,y: x+y
+
+  should be replaced by
+
+    lambda x_y: x_y[0] + x_y[1]
+
+
+Django 1.1 -> 2.0
+-----------------
+* The method db_type() in a custom field is expected to take a 'connection'
+  argument.  E.g.,
+
+    class CodeField(models.Field):
+        def db_type(self):
+            return 'text'
+
+  is now
+
+    class CodeField(models.Field):
+        def db_type(self,connection):
+            return 'text'
+
+
+* The url template tag requires view name to be quoted and prefixed by the
+  view's namespace (as specified by the variable app_name in urls.py).  E.g.,
+
+    {% url view-name %}
+
+  is now
+  
+    {% url 'app:view-name' %}
+
+
+* 'urlpatterns' in urls.py is expected to be a list of path() or re_path(),
+  whose second argument is a view function, not a string.  Basic regex
+  patterns are replaced by <type:name> form.  E.g.,
+
+    urlpatterns = patterns(
+        'elabsheet.cms.admin_views',
+        
+        # for downloading solution code
+        url(r'^admin/task/(\d+)/solution/', 'get_sol', 
+            name='admin-cms-task-get-sol'),
+        :
+    )
+
+  is now
+
+    from . import admin_views
+    app_name = 'cms'
+    urlpatterns = [
+        # for downloading solution code
+        path('admin/task/<int:task_id>/solution/', admin_views.get_sol, 
+            name='admin-cms-task-get-sol'),
+        :
+    ]
+
+
+* Arguments for the 'cycle' templatetag also need to be quotes.  E.g.,
+
+    <tr class="{% cycle row,row2 %}">
+
+  is now
+
+    <tr class="{% cycle 'row1' 'row2' %}">
+
+
+* The render_to_response() function has been deprecated.  Use render() instead.
+
+* The django.contrib.markup module has been deprecated.  A custom markdown
+  filter has been added in commons/templatetags/markdown_filter.py
+
+* CSRF is enforced.  The tag {% csrf_token %} must be added in every HTML form.
+
+* South has been integrated into Django.  All migrations created by south were
+  removed.  To migrate from an existing legacy e-Labsheet database, run:
+
+    ./manage.py migrate --fake-initial
+
+  Notes: all initial migrations in cms, lab, and logger were created using the legacy models.
+
+* The __unicode__ method in each model is no longer used in Python3.  Use
+  __str__ instead.
+
+* user.is_authenticated is now a bool, not a function
+
+* User password hash function has changed.
+
+* DateTimeField objects must be timezone-aware.
+
+* Use JsonResponse to response a JSON object instead of using json.dumps()
+  manually.
+
+* User messages now become messages app.
+
+    request.user.message_set.create("Your message")
+
+  has to be replaced by
+
+    from django.contrib import messages
+    messages.success(request, "Your message")
+
+* MySQL's MyISAM database engine does not support foreign-key constraints.
+  All tables should be converted to use InnoDB instead before applying
+  migrations.  The script ./convert-innodb.sql has been prepared for
+  convenience.

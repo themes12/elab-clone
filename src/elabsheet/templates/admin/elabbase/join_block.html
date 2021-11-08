@@ -1,0 +1,46 @@
+<fieldset class="module">
+  <h2>{% block child_search_result_header %}Choosing children{% endblock %}</h2>
+  &nbsp;Tags: <input id="child-tag-query" type="text" name="search_tags"/>
+  <input type="submit" id="child-tag-search-submit" value="Search"/>
+  <input type="submit" id="child-tag-search-reset" value="Reset"/>
+
+  <div id="child-list" style="padding: 5px">
+
+    {### place holder for search result; to be replaced by js below. ###}
+
+  </div>
+
+</fieldset>
+<script>
+function build_current_children_id_list() {
+  var l = "";
+  $("[id$={% spaceless %}{% block children_id_suffix %}{% endblock %}{% endspaceless %}]").each(function() { l = l + "," + this.value; });
+  return l.substr(1);
+}
+
+function submit_search_form(event) {
+  event.preventDefault();
+  post_data = { tags: $("#child-tag-query").val(),
+    current: build_current_children_id_list()
+  };
+  {% if parent_obj %}
+    post_data.{% spaceless %}{% block parent_id_var %}parent_id{% endblock %}{% endspaceless %} = {{ parent_obj.id }};
+  {% endif %}
+  $.post("{% spaceless %}{% block url_for_searching_child %}{% endblock %}{% endspaceless %}",
+         post_data,
+         function(data) {
+           $("#child-list").html(data);
+         });
+}
+
+$(document).ready(function () {
+  $("#child-tag-search-reset").click(
+    function(event) {
+      event.preventDefault();
+      $("#child-tag-query").attr("value","");
+    }
+  );
+
+  $("#child-tag-search-submit").click(submit_search_form);
+});
+</script>

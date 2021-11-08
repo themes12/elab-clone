@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% load elab_conf %}
+{% load elab_request %}
+
+{% block extra-head %}
+{{block.super}}
+<script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/csrf.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/reverse.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/elab-client.js' %}"></script>
+<link type="text/css" rel="stylesheet" href="{% static '/css/jquery-ui.min.css' %}" />
+{% endblock %}
+
+{% block headerbar_info %}
+<div id="welcome">Welcome <b>{{ user.first_name }} {{ user.last_name }}</b>
+{% if request %}[{% remote_addr request %}]{% endif %}</div>
+{% endblock %}
+
+{% block headerbarmenu %}
+{% if user.is_staff %}
+[<a href="{% url 'admin:index' %}">Admin</a>]
+{% endif %}
+[<a href="{% url 'logout' %}">Log out</a>]
+{% endblock %}
+    
+{% block footer %}
+<div id="footer" style="font-size: 70%; margin-top: 5px; padding-left: 5px; border-top: 1px lightgrey solid; color: grey;">
+Icons from <a href="http://sweetie.sublink.ca/">Sweetie</a>.
+</div>
+{% endblock %}

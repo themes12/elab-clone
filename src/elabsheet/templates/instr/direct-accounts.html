@@ -1,0 +1,120 @@
+{% extends "lab/base.html" %}
+
+{% load elab_conf %}
+{% load static %}
+
+{% block extra-head %}
+<script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+<style>
+  div .student-table {
+    overflow-x: auto;
+    padding: 5px;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #ddd;
+  }
+
+  th {
+    text-align: center;
+    padding: 8px;
+  }
+
+  td {
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:nth-child(even){ background-color: #f2f2f2; }
+  tr.disabled { background-color: #ffcccc; !important }
+
+  tr.entry:hover {
+    background-color: #ffa;
+  }
+</style>
+
+<script>
+  $(function() {
+    var $select_all = $("input#select-all");
+    $select_all.change(function() {
+      $("input[name='da']").prop("checked",$select_all.prop("checked"));
+    });
+  });
+</script>
+
+{% endblock %}
+
+{% block title %}Lab Options{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>Manage Direct-to-Lab Accounts</h1>
+<div style="padding:5px">
+  <b>Section:</b> {{sec}} <br/>
+  <b>Lab:</b> {{labinsec.number}} - {{labinsec.lab}}
+</div>
+<form action="{% url 'instr:direct-accounts-action' sec.id labinsec.id %}" method="POST">
+  {% csrf_token %}
+  <div class="student-table">
+    <table>
+      <tr>
+        <th><input type="checkbox" id="select-all"></th>
+        <th>Username</th>
+        <th>Direct-to-lab Account</th>
+        <th>Password</th>
+        <th>Enabled</th>
+        <th>Submission Allowed</th>
+        <th>Action</th>
+      </tr>
+      {% for s in students %}
+      <tr class="entry {{s.enabled|yesno:',disabled,'}}">
+        <td><input type="checkbox" name="da" value="{{s.id}}"></td>
+        <td>{{s.username}}</td>
+        <td style="text-align:center; color:brown"><tt>{{s.direct_user|default:"-"}}</tt></td>
+        <td style="text-align:center; color:brown"><tt>{{s.direct_passwd|default:"-"}}</tt></td>
+        <td style="text-align:center">{{s.enabled|yesno:"yes,no,-"}}</td>
+        <td style="text-align:center">{{s.submission_allowed|yesno:"yes,lab setting,-"}}</td>
+        <td>
+          {% if s.direct_id %}
+            <a href="{% url 'instr:generate-direct-account' sec.id labinsec.id s.id %}"
+              class="btn btn-outline-success" onclick="return confirm('Account exists.  Continue?');">generate</a>
+            <a href="{% url 'instr:remove-direct-account' sec.id labinsec.id s.id %}" 
+              class="btn btn-outline-danger" onclick="return confirm('Are you sure?');">remove</a>
+            <a href="{% url 'admin:lab_directtolabaccount_change' s.direct_id %}" 
+              class="btn btn-outline-primary" target="_blank">edit</a>
+          {% else %}
+            <a href="{% url 'instr:generate-direct-account' sec.id labinsec.id s.id %}" class="btn btn-outline-success">generate</a>
+            <a href="#" class="btn btn-outline-danger disabled">remove</a>
+            <a href="{% url 'admin:lab_directtolabaccount_add' %}?user={{s.id}}&labinsec={{labinsec.id}}"
+              class="btn btn-outline-primary" target="_blank">edit</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div style="padding:5px">
+    <button class="btn btn-outline-success"
+      name="action" value="generate"
+      onclick="return confirm('This will replace selected accounts.  Continue?');">Generate Selected</button>
+    <button class="btn btn-outline-danger"
+      name="action" value="remove"
+      onclick="return confirm('This will remove selected accounts.  Continue?');">Remove Selected</button>
+    <button class="btn btn-outline-info"
+      name="action" value="enable"
+      onclick="return confirm('This will enable selected accounts.  Continue?');">Enable Selected</button>
+    <button class="btn btn-outline-warning"
+      name="action" value="disable"
+      onclick="return confirm('This will disable selected accounts.  Continue?');">Disable Selected</button>
+  </div>
+  <div style="padding:5px">
+    <a href="{% url 'instr:export-direct-accounts' sec.id labinsec.id %}"
+      class="btn btn-outline-primary">Export CSV</a>
+  </div>
+</div>
+{% endblock %}

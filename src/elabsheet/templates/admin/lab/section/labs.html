@@ -1,0 +1,100 @@
+{% extends "admin/change_form.html" %}
+
+{% load elab_conf %}
+{% load static %}
+
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{% url 'admin:app_list' 'lab' %}">Lab</a> &rsaquo; 
+  <a href="{% url 'admin:lab_section_changelist' %}">Section</a> &rsaquo; 
+  <a href="{% url 'admin:lab_section_change' section.id %}">{{ section }}</a>
+</div>
+{% endif %}{% endblock %}
+
+{% block content %}
+<label class="required">Course:</label> {{ section.course }}<br/>
+
+<table width="100%"><tr><td width="50%">
+<fieldset class="module aligned">
+  <h2>Current labs</h2>
+  <div class="form-row">
+    <form action="{% url 'lab:admin-lab-section-labs-update' section.id %}" method="post">
+      {% csrf_token %}
+      {{ cur_lab_formset.management_form }}
+      <fieldset class="module aligned">
+	<table width="100%">
+	  <tr>
+          <th>Number</th><th>Lab</th><th>Disabled?</th><th>Read only?</th><th>Delete?</th>
+	  </tr>
+	  {% for form, ls in cur_lab_forms_with_labs %}
+	    <tr>
+	      <td>{{ form.number.errors }}{{ form.number }}</td>
+        <td>{{ ls.lab }}</td>
+	      <td>{{ form.disabled }}</td>
+	      <td>{{ form.read_only }}</td>
+	      <td>{{ form.DELETE }}</td>
+	    </tr>
+	  {% endfor %}
+	</table>
+      </fieldset>
+      <div class="submit-row">
+	<input type="submit" value="Update"/>
+      </div>
+    </form>
+  </div>
+</fieldset>
+</td><td width="50%">
+<fieldset class="module aligned">
+  <h2>Available labs in courses</h2>
+  <div class="form-row">
+    <form action="{% url 'lab:admin-lab-section-labs-add' section.id %}" method="post">
+      {% csrf_token %}
+      {{ avail_lab_formset.management_form }}
+      <fieldset class="module aligned">
+	<table width="100%">
+	  <tr>
+	    <th>Number</th><th>Lab</th><th>Selected?</th>
+	  </tr>
+	  {% for form, lab_incourse in avail_lab_forms_with_data %}
+	    <tr>
+	      <td>{{ lab_incourse.number }}</td>
+	      <td>{{ lab_incourse.lab }}</td>
+	      <td>{{ form.selected }}</td>
+	    </tr>
+	  {% empty %}
+	    <tr>
+	      <td></td><td>None</td><td></td>
+	    </tr>
+	  {% endfor %}
+	</table>
+      </fieldset>
+      <div class="submit-row">
+	<input type="submit" value="Add"/>
+      </div>
+    </form>
+  </div>
+</fieldset>
+</td></tr></table>
+<fieldset class="module aligned">
+  <h2>Other labs</h2>
+  <div class="form-row">
+    <form action="{% url 'lab:admin-lab-section-labs-addother' section.id %}" method="post">
+      {% csrf_token %}
+      <fieldset class="module aligned">
+	<table>
+	  <tr>
+	    <th>Number:</th>
+	    <td>{{ other_lab_form.number.errors }}{{ other_lab_form.number }}</td>
+	    <th>Lab:</th>
+	    <td>{{ other_lab_form.lab.errors }}{{ other_lab_form.lab }}</td>
+	    <td><input type="submit" value="Add"/></td>
+	    <td width="100%"></td>
+	  </tr>
+	</table>
+      </fieldset>
+    </form>
+  </div>
+</fieldset>
+
+{% endblock %}

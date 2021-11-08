@@ -1,0 +1,7 @@
+<div class="btn-group">
+  <a href="{% url 'taskpads:change' task_pad.access_key task_pad.secret_key %}" class="btn {% if current_page == 'edit' %}btn-primary{% else %}btn-outline-secondary{% endif %}">แก้ไขโจทย์</button>
+  <a href="{% url 'taskpads:manage' task_pad.access_key task_pad.secret_key %}" class="btn {% if current_page == 'manage' %}btn-primary{% else %}btn-outline-secondary{% endif %}">จัดการ</a>
+  <button id="share_button_id" type="button" class="btn btn-outline-secondary" data-toggle="popover" data-placement="bottom" title="แบ่งปันโจทย์นี้">แชร์</button>
+</div>
+
+{% include 'taskpads/include/share_popover_content.html' %}

@@ -1,0 +1,82 @@
+{% extends "lab/base.html" %}
+
+{% load elab_conf %}
+{% load static %}
+{% load mathjax %}
+
+{% block title %}
+Test Task
+{% endblock %}
+
+{% block extra-head %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/jquery.barrating.min.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/csrf.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/elab-client.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/reverse.js' %}"></script>
+  <link type="text/css" rel="stylesheet" href="{% static '/css/jquery-ui.min.css' %}" />
+  <link type="text/css" rel="stylesheet" href="{% static '/css/css-stars.css' %}" />
+  {% mathjax %}
+  <script>
+    $(document).ready(function() {
+      ElabClient.render_components({{task.id}});
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+<fieldset class="module aligned">
+  <div class="form-row">
+    {% if is_supertask %}
+      <form method="get" action="{% url 'cms:admin-cms-task-test' task.id %}?seed={{seed}}&diff={{diff}}">
+        <div>
+          <b>Child task parameters</b>
+        </div>
+        <div>
+          Seed: <input type="text" size="10" name="seed" value="{{seed}}">
+          Difficulty: <input type="text" size="5" name="diff" value="{{diff}}">
+          <input type="submit" value="Generate">
+          <input type="submit" name="action" value="Random">
+          <a class="btn btn-info" href="{% url 'admin:cms_cachedchildtask_change' task.cache.id %}" target="_blank">View Cached Child Task</a>
+          <a class="btn btn-primary" href="{% url 'admin:cms_cachedchildtask_changelist' %}?parent_task={{task.id}}" target="_blank">All {{cached_count}} Cached Child Tasks</a>
+        </div>
+        <div>
+          Adjusted Seed: {{task.seed}} | Adjusted Difficulty: {{task.difficulty}}
+        </div>
+      </form>
+    {% endif %}
+
+    {% if submission %}
+      <fieldset class="module aligned">
+        <h2>Grading result</h2>
+        <div id="id_grading_result" class="form-row" style="color: darkblue; display:none">
+          {% include "lab/include/submission.html" %}
+        </div>
+      </fieldset>
+      <script>
+        $(document).ready(function() {
+          manual_scores = {{manual_scores_json|safe}}
+          $("#id_grading_result").slideDown("normal");
+          ElabClient.create_manual_score_boxes($("#id_grading_result"),{readOnly:true});
+          ElabClient.update_manual_score_boxes($("#id_grading_result"),manual_scores);
+        });
+      </script>
+    {% endif %}
+
+    {% if is_supertask %}
+    <form method="post" enctype="multipart/form-data"
+      action="{% url 'cms:admin-cms-task-test' task.id %}?seed={{seed}}&diff={{diff}}">
+    {% else %}
+    <form method="post" enctype="multipart/form-data" action="{% url 'cms:admin-cms-task-test' task.id %}">
+    {% endif %}
+      {% csrf_token %}
+      <div id="assignment-body">
+	{{ task.html }} 
+      </div>
+      <input type="submit" name="action" value="Submit"/>
+    </form>
+  </div>
+</fieldset>
+{% endblock %}

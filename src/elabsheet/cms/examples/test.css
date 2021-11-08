@@ -1,0 +1,19 @@
+textarea {
+   border-width: 1px;
+   border-color: #000000;
+   font-family: Courier;
+   font-size: smaller;
+   background-color: #0000ff;
+   color: #ffff00;
+}
+input {
+   border-width: 1px;
+   border-color: #000000;
+   background-color: #0000ff;
+   color: #ffff00;
+   font-family: Courier;
+   font-size: smaller;
+}
+code {
+   font-family: Courier;
+}

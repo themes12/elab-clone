@@ -1,0 +1,76 @@
+{% extends "admin/change_form.html" %}
+{% load elab_conf %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+  <a href="{% url "admin:index" %}">Home</a> &rsaquo;
+  <a href="{% url "admin:app_list" "lab" %}">Lab</a> &rsaquo; 
+  <a href="{% url "admin:lab_section_changelist" %}">Section</a> &rsaquo; 
+  <a href="{% url "admin:lab_section_change" section.id %}">{{ section }}</a>
+</div>
+{% endif %}{% endblock %}
+
+
+{% block content %}
+<fieldset class="module aligned">
+  <div class="form-row">
+    <label class="required">Course:</label> {{ section.course }}<br/>
+  </div>
+  <div class="form-row">
+    <label class="required">Section:</label> {{ section }}
+  </div>
+  <h2>Students in section</h2>
+  <div class="form-row">
+    <fieldset class="module aligned">
+      <div style="padding: 5px">
+	<div style="display: inline-block">
+	  <form action="{% url 'lab:admin-lab-section-enrollment-add' section.id %}" method="post">
+      {% csrf_token %}
+	    <input name="student" type="text"/>	  
+	    <input type="submit" value="Add student"/>
+	  </form>
+	</div>
+	<div style="display: inline-block; margin-left: 1em;">
+	  <form action="{% url 'lab:admin-lab-section-enrollment-upload' section.id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+	    Student list: <input name="uploaded_file" type="file"/>
+	    <input type="submit" value="Upload list"/>
+	  </form>
+	</div>
+	<div>
+	  Format for each student: <tt>[id], [first name] [surname]</tt><br/>
+          The student list file should be encoded in UTF-8 or TIS-620.  
+          The fields can be flexible, i.e., you may have running numbers or course numbers before the IDs or department codes after the surnames.  You can directly import the file obtained from regis.ku.ac.th.
+	</div>
+      </div>
+    </fieldset>
+
+    <form action="{% url 'lab:admin-lab-section-unenroll' section.id %}" method="post">
+      {% csrf_token %}
+      <select id="id_students" name="students" multiple="multiple" style="vertical-align: top">
+	{% for student in students %}
+          <option value="{{ student.id }}">{{ student.username }} {{ student.first_name}} {{ student.last_name }}</option>
+	{% endfor %}
+      </select>
+      <input id="id_unenroll_input" type="submit" value="Unenroll selected"/>
+    </form>
+  </div>
+</fieldset>
+<script>
+  $(document).ready(function() {
+    $("#id_unenroll_input").click(function() {
+      if($("#id_students").attr('selectedIndex')==-1) {
+        alert('Please choose some student');
+        return false;
+      } else
+        return confirm('Unenroll? Are you sure?');
+    });
+  });
+</script>
+{% endblock %}

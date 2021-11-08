@@ -1,0 +1,14 @@
+FROM ubuntu:16.04
+
+COPY change-apt-source.sh /root/scripts/
+RUN /root/scripts/change-apt-source.sh
+
+ADD python-3.6.5.tar.xz /opt/
+RUN mv /opt/python-3.6.5/lib/python3.6/test ./python-test \
+ && mv /opt/python-3.6.5/lib/python3.6/lib2to3/tests ./lib2to3-tests \
+ && /opt/python-3.6.5/bin/python3 -m compileall -q /opt/python-3.6.5/lib \
+ && mv ./python-test /opt/python-3.6.5/lib/python3.6/test \
+ && mv ./lib2to3-tests /opt/python-3.6.5/lib/python3.6/lib2to3/tests
+
+COPY prepare-machine.sh /root/scripts/
+RUN DEBIAN_FRONTEND=noninteractive /root/scripts/prepare-machine.sh --docker

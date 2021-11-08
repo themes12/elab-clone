@@ -1,0 +1,35 @@
+{% extends "admin/elabbase/child_search_result.html" %}
+
+{% block child_search_results %}
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="35%">Lab</th>
+      <th width="35%">Note</th>
+      <th width="25%">Tags</th>
+      <th width="5%"></th>
+    </tr>
+  </thead>
+  {% if labs %}
+    {% for lab in labs %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td>{{ lab.name }}</td>
+        <td>{{ lab.note }}</td>
+        <td>{{ lab.tags }}</td>
+        <td>[<a id="lab-id-{{ lab.id }}" class="child-adding-link" href="">Add</a>]</td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+      <td>Nothing matched</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  {% endif %}
+</table>
+{% endblock child_search_results %}
+
+{% block url_for_adding_child %}
+  {% url 'cms:admin-cms-course-add-lab' %}
+{% endblock %}

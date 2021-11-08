@@ -1,0 +1,43 @@
+{% extends "taskpads/base.html" %}
+
+{% block title %}Post Taskpad{% endblock %}
+
+{% block content %}
+  {% if messages %}
+  <ul class="messagelist">
+      {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12">
+          <h4>นำโจทย์ไปใช้: {{post.task_pad.task}}</h4>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            รายชื่อผู้เรียน:
+            {{ form.participants.errors }}
+            {{ form.participants }}
+          </div>
+          <div class="form-group">
+            {{ form.enabled }} เปิดให้ใช้งาน
+          </div>
+          <button class="btn btn-primary" type="submit">บันทึก</button>
+        </div>
+        {% if post.participant_set.all %}
+        <div class="col-sm-12">
+          <hr>
+          <h4>รายชื่อและสถานะผู้เรียน</h4>
+          {% with post as task_post %}
+            {% include 'taskpads/include/task_post_participant_table.html' %}
+          {% endwith %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+{% endblock %}

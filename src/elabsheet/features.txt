@@ -1,0 +1,24 @@
+Suggested Features
+------------------
+
+x Regrade individual submission
+* Interval-based access control
+* Show summary of comments for embedded media
+* Extensible/customizable builders
+* Code segment copying (with blanks and filled texts)
+* Tag templates for tasks
+* Embedded slide show
+x Automatic task generation
+* Automatic task selection
+* Private tasks/labs/courses
+* Restructure lab assignment page
+    * Aligned check marks
+    x Collapsible task list
+* Video clip always-on-screen display
+* Custom CSS
+* Collaborative editing (similar to Google Docs)
+
+Task Pads
+---------
+* Allow deletion of student groups
+* Allow deletion of unused taskpads

@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+
+{% load markdown_filter %}
+{% load static %}
+{% load mathjax %}
+
+{% block extrahead %}
+<link type="text/css" rel="stylesheet" href="{% static '/css/jquery-ui.min.css' %}" />
+<script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/jquery-ui.min.js' %}"></script>
+{% mathjax %}
+{% endblock %}
+
+{% block content %}
+<fieldset class="module aligned">
+<div class="form-row">
+  <div id="help-tabs">
+    <ul>
+      {% for tab in help_tabs %}
+        <li>
+	  <a href="#help-tab-{{ forloop.counter }}"><span>{{ tab.title }}</span></a>
+	</li>
+      {% endfor %}
+    </ul>
+    {% for tab in help_tabs %}
+      <div id="help-tab-{{ forloop.counter }}">
+        {{ tab.body|markdown|safe }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+</fieldset>
+<script>
+$(document).ready(function(){
+  $("#help-tabs").tabs();
+});
+</script>
+{% endblock %}

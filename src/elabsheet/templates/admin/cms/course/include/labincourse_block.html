@@ -1,0 +1,12 @@
+{% extends "admin/elabbase/join_block.html" %}
+
+{% block child_search_result_header %}
+Choosing labs
+{% endblock %}
+
+{% block url_for_searching_child %}
+  {% url 'cms:admin-cms-course-lab-search' %}
+{% endblock %}
+
+{% block parent_id_var %}course_id{% endblock %}
+{% block children_id_suffix %}lab{% endblock %}

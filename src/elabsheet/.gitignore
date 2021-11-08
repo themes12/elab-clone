@@ -1,0 +1,17 @@
+*.pyc
+*~
+tmp
+media
+grader/log
+sandbox/box
+settings_local.py
+.DS_Store
+.coverage
+htmlcov/*
+*.swp
+misc/*
+public
+static/js/reverse.js
+db.sqlite3
+lab/backends/tqfauthen.py
+ve

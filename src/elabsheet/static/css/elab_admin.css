@@ -1,0 +1,15 @@
+
+textarea#id_comments {
+    width: 200px;
+    height: 100px;
+}
+
+form#course_form #content-main-right {
+    width: 500px;
+    float: right;
+}
+
+form#course_form #content-main-left {
+    width: 450px;
+}
+

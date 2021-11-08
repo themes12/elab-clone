@@ -1,0 +1,22 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_static %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  {% if original %}
+  <script>
+    if (!$) $ = django.jQuery;
+    $(document).ready(function(){
+      // added 'IP Lock' button
+      $("ul.object-tools").prepend(
+      '<li>' +
+      '  <a id="ip_locking_link"' +
+        '    href="{% url 'admin:lab_singleiplock_changelist' %}?labinsec={{original.labinsec.id}}"' +
+      '    target="_blank">IP Locking' +
+      '  </a>' +
+      '</li>');
+    });
+  </script>
+  {% endif %}
+{% endblock %}
+

@@ -1,0 +1,15 @@
+syntax: glob
+media
+tmp
+*.pyc
+*~
+grader/log
+sandbox/box
+settings_local.py
+.DS_Store
+.coverage
+htmlcov/*
+*.swp
+misc/*
+public
+static/js/reverse.js

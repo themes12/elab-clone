@@ -1,0 +1,58 @@
+{% extends "admin/change_form.html" %}
+
+{% load static %}
+
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+  <a href="{% url "admin:index" %}">Home</a> &rsaquo;
+  <a href="{% url "admin:app_list" "lab" %}">Lab</a> &rsaquo; 
+  <a href="{% url "admin:lab_section_changelist" %}">Section</a> &rsaquo; 
+  <a href="{% url "admin:lab_section_change" section.id %}">{{ section }}</a>
+</div>
+{% endif %}{% endblock %}
+
+{% block content %}
+<label class="required">Course:</label> {{ section.course }}<br/>
+
+<fieldset class="module aligned">
+  <h2>New announcement</h2>
+  <div class="form-row">
+    <form action="{% url 'lab:admin-lab-section-announcements-add' section.id %}" method="post">
+      {% csrf_token %}
+      {{ new_form.as_p }}
+      <div class="submit-row">
+	<input type="submit" value="Create"/>
+      </div>      
+    </form>
+  </div>
+  <h2>Current announcements</h2>
+  <div class="form-row">
+    <form action="{% url 'lab:admin-lab-section-announcements-update' section.id %}" method="post">
+      {% csrf_token %}
+      {{ announcement_formset.management_form }}
+
+      <table>
+	<tr>
+	  <th>Title</th>
+	  <th>Body (in markdown)</th>
+	  <th>Published?</th>
+	  <th>Delete?</th>
+	</tr>
+        {% for form in announcement_formset.forms  %}
+          <tr>
+	    {{ form.id }}
+            <td>{{ form.title }}</td>
+            <td>{{ form.body }}</td>
+            <td>{{ form.is_published }}</td>
+            <td>{{ form.DELETE }}</td>
+	  </tr>
+	{% endfor %}
+      </table>
+      <div class="submit-row">
+	<input type="submit" value="Update"/>
+      </div>
+    </form>
+  </div>
+</fieldset>
+
+{% endblock %}

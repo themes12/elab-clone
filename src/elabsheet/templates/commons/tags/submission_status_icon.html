@@ -1,0 +1,21 @@
+{% load static %}
+{% if submission %}
+  {% if submission.graded %}
+    {% if submission.passed %}
+      <img src="{% static '/images/16-em-check.png' %}"/>
+    {% else %}
+      <img src="{% static '/images/16-em-cross.png' %}"/>
+    {% endif %} 
+  {% else %}
+    <img src="{% static '/images/16-clock.png' %}"/>
+  {% endif %}
+  {% if submission.assignment.task.has_manual_grading %}
+    ({% spaceless %}
+    <img src="{% static '/images/16-member.png' %}"/>
+    {{ submission.sum_manual_scores }}/{{ submission.assignment.task.manual_full_score }} 
+    {% if not submission.manual_grading_completed %}
+      ?
+    {% endif %}
+    {% endspaceless %})
+  {% endif %}
+{% endif %}

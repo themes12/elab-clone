@@ -1,0 +1,207 @@
+{% extends "taskpads/base.html" %}
+{% load static mathjax %}
+{% block extra-head %}
+{% mathjax %}
+  <link rel="stylesheet" type="text/css" href="{% static '/css/base.css' %}" />
+  <style>
+   body {
+       padding-top: 5rem;
+   }
+  </style>
+{% endblock %}
+
+{% block title %}Taskpad{% endblock %}
+
+{% block content %}
+
+  <div class="modal" id="modal-explain-results" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">อธิบายผลลัพธ์</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="div-explain-results"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-compiler-messages" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">รายงานความผิดพลาดจากคอมไพเลอร์</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <pre id="pre-compiler-messages"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% if participant.name %}
+        <h5>ชื่อผู้ส่งงาน: {{participant.name}}</h5>
+        {% endif %}
+        <h5>
+          สถานะการส่งล่าสุด:
+          <i class="fa fa-clock" id="status-grading" style="display:none; color:blue; font-weight:100"> กำลังตรวจ...</i>
+          <i class="fa fa-check" id="status-passed" style="display:none; color:green"> ผ่าน</i>
+          <i class="fa fa-times" id="status-failed" style="display:none; color:red"> ไม่ผ่าน</i>
+          <span id="status-detail" style="font-family: monospace; font-size:80%">
+            -
+          </span>
+          <button type="button" id="button-detail" class="btn btn-info" data-toggle="modal" data-target="#modal-explain-results" style="display:none" tabindex="-1">
+            อธิบายผล
+            <i class="fa fa-clipboard" style="font-weight:100"></i>
+          </button>
+          <button type="button" id="button-compiler-messages" class="btn btn-danger" data-toggle="modal" data-target="#modal-compiler-messages" style="display:none" tabindex="-1">
+            compiler messages
+            <i class="fa fa-bolt"></i>
+          </button>
+        </h5>
+        <hr>
+      </div>
+      <div class="col-md-12">
+        <form id="task-form">
+          {% csrf_token %}
+          <h1>{{ task.name }}</h1>
+          <div style="padding: 5px; border: 1px solid lightgray; border-radius: 5px;">
+            {% if recent_submission %}
+              {{ recent_submission.html }}
+            {% else %}
+              {{ task.html }}
+            {% endif %}
+          </div>
+          <div class="form-group" style="margin-top: 5px;">
+            <button type="button" class="btn btn-primary btn-lg" id="submit">
+              ส่งคำตอบ
+              <i class="fa fa-share-square"></i>
+            </button>
+            <span id="message-sending" style="color: blue; display:none">กำลังส่ง...</span>
+            <span id="message-error" style="color:red; display:none">ส่งคำตอบไม่สำเร็จ</span>
+            {% if share_key %}
+              <button type="button" class="btn btn-secondary btn-lg" id="clone_id">
+                คัดลอกโจทย์ไปใช้
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content_script %}
+  <script>
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var taskModified = false;
+
+    var recent_status = null;
+
+    {% if recent_submission %}
+    recent_status = {{recent_submission.json_status|safe}};
+    {% endif %}
+
+    $(function(){
+      update_status(recent_status);
+    });
+
+    $("#submit").on("click",function() {
+      var url = "{% url 'taskpads:ajax_submit' post.key participant.key %}";
+
+      $("#message-sending").show();
+      recent_status = {graded: false};
+      update_status(recent_status);
+      $.post(url,$("#task-form").serialize())
+       .done(function(data) {
+         $("#message-sending").fadeOut(500);
+         refresh_status(data.submission_id);
+       })
+       .fail(function() {
+         $("#message-sending").hide();
+         $("#message-error").show(0).delay(1000).fadeOut(500);
+       });
+    });
+
+    refresh_status = function(submission_id) {
+      //console.log("refreshing...");
+      var url = Urls['taskpads:ajax_submission_status']("{{participant.key}}",submission_id);
+      $.get(url, function(data) {
+        recent_status = data;
+        update_status(recent_status);
+        if (!recent_status.graded) {
+          setTimeout(function() {
+            refresh_status(submission_id);
+          },1000);
+        }
+      });
+    };
+
+    update_status = function(submission_status) {
+      if (!submission_status || !submission_status.graded) {
+        if (!submission_status) {
+          $("#status-grading").hide();
+          $("#status-detail").show().text("-");
+        }
+        else {
+          $("#status-grading").show();
+          $("#status-detail").hide();
+        }
+        $("#status-passed").hide();
+        $("#status-failed").hide();
+        $("#button-detail").hide();
+        $("#button-compiler-messages").hide();
+      }
+      else {
+        if (submission_status.passed) {
+          $("#status-grading").hide();
+          $("#status-passed").show();
+          $("#status-failed").hide();
+        }
+        else {
+          $("#status-grading").hide();
+          $("#status-passed").hide();
+          $("#status-failed").show();
+        }
+        $("#button-detail").show();
+        $("#status-detail").show().text('[' + submission_status.results + ']');
+        $("#div-explain-results").html(submission_status.result_explanation);
+        $("#pre-compiler-messages").text(submission_status.compiler_messages);
+        if (submission_status.compiler_messages) {
+          $("#button-compiler-messages").show();
+        }
+        ElabClient.remove_manual_score_boxes($("form#task-form"));
+        ElabClient.create_manual_score_boxes(
+          $("form#task-form"),{readOnly:true});
+        ElabClient.update_manual_score_boxes(
+          $("form#task-form"),submission_status.manual_scores);
+      }
+
+      $("#clone_id").click(function(){
+        var url = Urls['taskpads:clone']("{{task_pad.access_key}}","{{share_key}}");
+        $.post(url, {
+          csrfmiddlewaretoken: csrftoken
+        },function(result) {
+          var url = Urls['taskpads:change'](result.access_key, result.secret_key);
+          window.location = url;
+        });
+      });
+    };
+  </script>
+{% endblock %}

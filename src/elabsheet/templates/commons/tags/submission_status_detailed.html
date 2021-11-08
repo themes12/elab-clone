@@ -1,0 +1,27 @@
+{% extends "commons/tags/submission_status.html" %}
+{% load static %}
+
+{% block submission_result_details %}
+  {% if submission.graded %}
+    <span title="P = Pass, - = Fail, S = Incorrect Spacing, C = Incorrect Case">
+      [{% for r in submission.results %}{{ r }}{% endfor %}]
+    </span>
+    {% if submission.id %}
+      <img 
+        class="result-details-icon"
+        style="vertical-align:bottom; cursor: pointer"
+        title="Explain results"
+        src="{% static '/images/16-clipboard-audit.png' %}"
+        onclick="ElabClient.show_result_explanation(this,{{submission.id}})"/>
+    {% else %}
+      <img 
+        class="result-details-icon"
+        style="vertical-align:bottom; cursor: pointer"
+        title="Explain results"
+        src="{% static '/images/16-clipboard-audit.png' %}"
+        onclick="ElabClient.show_result_explanation(this,'{{submission.prerendered_results|escapejs}}')"/>
+    {% endif %}
+  {% else %}
+    (submitted at {{ submission.submitted_at|date:"G:i d M Y" }})
+  {% endif %}
+{% endblock %}

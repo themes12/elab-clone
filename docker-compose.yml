@@ -1,0 +1,66 @@
+version: '3'
+services:
+  web:
+    image: cjaikaeo/elab-base
+    container_name: elab-web
+    depends_on:
+      - db
+    tty: true
+    environment:
+      TZ: "Asia/Bangkok"
+      DJANGO_ADMIN_USER: "admin"
+      DJANGO_ADMIN_PASSWORD: "adminpw"
+    volumes:
+      - ./src/elabsheet:/home/elab/app/elabsheet
+      - ./scripts:/scripts
+    restart: always
+    entrypoint: "/scripts/start-web.sh"
+
+  grader1: &grader_default
+    image: cjaikaeo/elab-base
+    container_name: elab-grader1
+    depends_on:
+      - web
+    tty: true
+    environment:
+      TZ: "Asia/Bangkok"
+    volumes:
+      - ./src/elabsheet:/home/elab/app/elabsheet
+      - ./scripts:/scripts
+    restart: always
+    entrypoint: "/scripts/start-grader.sh"
+
+  grader2:
+    <<: *grader_default
+    container_name: elab-grader2
+
+  db:
+    image: mysql:5.7
+    container_name: elab-db
+    environment:
+      TZ: "Asia/Bangkok"
+      MYSQL_USER: "elab"
+      MYSQL_PASSWORD: "elabdbpass"
+      MYSQL_DATABASE: "elab"
+      MYSQL_ROOT_PASSWORD: "mysql20181008"
+    volumes:
+      - ./db/mysql-datadir:/var/lib/mysql
+      - ./db/etc/custom.cnf:/etc/mysql/conf.d/custom.cnf
+    restart: always
+
+  nginx:
+    image: nginx:1.15.5
+    container_name: elab-nginx
+    depends_on:
+      - web
+    environment:
+      TZ: "Asia/Bangkok"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./src/elabsheet/public/media:/media
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8888:8000
+    restart: always

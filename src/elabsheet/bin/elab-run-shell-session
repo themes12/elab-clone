@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+    echo "Execute statements from a simple shell session output."
+    echo "The script extracts and executes only lines starting with the $ prompt."
+    echo
+    echo "Usage: $0 <shell-session-log> [preamble files...]"
+    exit 1
+fi
+
+log=$1
+shift
+tmp=$(mktemp /tmp/elab.shell-session.XXXX)
+
+log_dir=$(cd $(dirname $log); pwd)
+
+if [ "$*" ]; then
+    cat $* > $tmp
+fi
+
+grep '^\$ ' $log | sed 's/^\$ //' >> $tmp
+sh $tmp
+rm $tmp

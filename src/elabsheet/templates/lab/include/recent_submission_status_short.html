@@ -1,0 +1,5 @@
+{% load static %}
+{% load elab_submission %}
+<span style="padding-left:5px">Recent submission on {{ recent_submission.submitted_at|date:"G:i d M Y" }} 
+<img src="{% static '/images/16-arrow-right.png' %}"/>
+Result: {% sub_status_detailed recent_submission %}</span><br/>

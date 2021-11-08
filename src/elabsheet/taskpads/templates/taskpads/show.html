@@ -1,0 +1,26 @@
+{% extends "taskpads/base.html" %}
+{% load static %}
+{% block extra-head %}
+  <link rel="stylesheet" type="text/css" href="{% static '/css/base.css' %}" />
+  <style>
+   body {
+       padding-top: 5rem;
+   }
+  </style>
+{% endblock %}
+
+{% block title %}Taskpad{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% if task %}
+          {% include "taskpads/include/task.html" %}
+        {% else %}
+          Error: empty task
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "lab/base.html" %}
+{% load static %}
+{% load elab_conf %}
+{% load elab_submission %}
+{% load mathjax %}
+
+{% block title %}View All Submissions for Assignment{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block extra-head %}
+  {{block.super}}
+  {% mathjax %}
+  <style type="text/css">
+    div.submission
+    {
+        border: 1px solid gray;
+        padding: 5px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        display: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<h1>View All Submissions for Student</h1>
+<div style="margin:5px;">
+  <b>Student:</b> {{student.first_name}} {{student.last_name}} ({{student.username}})<br/>
+  <b>Assignment:</b> {{assignment.lab}} &rarr;
+  <a href="{% url 'instr:view-submissions' sec.id assignment.id %}" target="_blank">{{assignment.task}}</a>
+  <br/>
+  <b>Number of submission(s):</b> {{submissions|length}}
+  <button id="show-hide-all">Show All</button>
+  <ul>
+    {% for submission in submissions %}
+    <li>
+    <a href="#" class="submission">{{submission.submitted_at|date:"M d Y G:i:s"}}
+      from {{submission.remote_addr}}</a>
+        Result: {% sub_status_detailed submission %}
+        <a class="btn btn-outline-info" 
+          href="{% url 'instr:regrade-submission' sec.id submission.id %}?next={{request.path}}">regrade</a>
+        <a class="btn btn-outline-danger" 
+          onclick="return confirm('Do you want to delete this submission?');"
+          href="{% url 'instr:delete-submission' sec.id submission.id %}?next={{request.path}}">delete</a>
+        <div class="submission" id="submission-{{submission.id}}">
+          {{submission.html}}
+        </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+  var manual_scores = {{manual_scores_json|safe}};
+  $(document).ready(function()
+  {
+    // toggle submission when the timestamp is clicked
+    $("a.submission").click(function(event) 
+    {
+      event.preventDefault();
+      $(this).nextAll("div.submission").slideToggle("normal");
+    });
+
+    $("#show-hide-all").click(function () {
+      if ($(this).text() == "Show All") {
+        $("div.submission").show();
+        $(this).text("Hide All");
+      }
+      else {
+        $("div.submission").hide();
+        $(this).text("Show All");
+      }
+    });
+
+    for (var s in manual_scores) {
+      var submission_scores = manual_scores[s];
+      var $element = $("div#submission-"+s);
+      ElabClient.create_manual_score_boxes($element,{readOnly:true});
+      ElabClient.update_manual_score_boxes($element,submission_scores);
+    }
+
+  });
+</script>
+{% endblock %}

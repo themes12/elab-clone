@@ -1,0 +1,262 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static '/js/jquery-3.3.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/jquery-fieldselection.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/taskeditor.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/csrf.js' %}"></script>
+{% endblock %}
+
+{% block object-tools %}
+  {{ block.super }}
+  {% if original %}
+  <script>
+    $(document).ready(function(){
+      // added 'Clone' and 'New version' links
+      $("ul.object-tools").prepend('<li><a id="task_clone_link" class="addlink" href="{% url 'cms:admin-cms-task-clone' original.id %}">Clone</a></li>\
+        <li><a id="task_new_version_link" class="addlink" href="{% url 'cms:admin-cms-task-new-version' original.id %}">New version</a></li>');
+
+      // confirmations
+      $("a#task_clone_link").click(function(){
+        return confirm("This will create a clone copy of the task, and also UNDO all your current changes.  Are you sure?");
+      });
+      $("a#task_new_version_link").click(function(){
+        return confirm("This will create a new version of the task, and also UNDO all your current changes.  Are you sure?");
+      });
+    });
+  </script>
+  {% endif %}
+{% endblock %}
+
+{% block after_related_objects %}
+<div class="inline-group">
+<div class="tabular inline-related">
+<fieldset class="module">
+
+  <h2 id="preview_head">
+    Preview 
+    [<a id="task_preview_toggle" href="">Toggle</a>]
+    {% if original %}
+      [<a id="task_test_link" href="{% url 'cms:admin-cms-task-test' original.id %}"
+          target="_blank">Test</a>]
+    {% else %}
+      [<a id="task_test_link" href="">Test</a>]
+    {% endif %}
+    [<a id="task_preview_refresh" href="">Refresh</a>]
+    <span id="task_preview_notice" style="display: none">
+      <b>Refreshed...</b>
+    </span>
+    <br/>
+    (Hover the mouse over a non-code blank to see a solution)
+  </h2>
+  <div id="task_preview">
+      <iframe id="preview_frame" src="{% url 'cms:admin-cms-task-preview-iframe' %}" width="100%" height="500"></iframe>
+  </div>
+
+{% if original %}
+
+  <!-- These information are for saved task. -->
+
+  <h2>Generated Html Template [<a id="html_template_preview_toggle" href="">Toggle</a>]</h2>
+  <div id="html_template_preview" style="display:none">
+    <table>
+      <tr class="row1">
+        <td>
+          <textarea rows="10" cols="60" class="vLargeTextField" readonly>{{ original.html_template }}</textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>Generated Test Cases [<a id="testcases_preview_toggle" href="">Toggle</a>]</h2>
+  <div id="testcases_preview" style="display:none">
+    <table>
+      <thead>
+        <tr>
+          <th>Input</th>
+          <th>Visible</th>
+          <th>Hint</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      {% for testcase in original.testcases %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td class="input">
+          <tt>{{ testcase.input|linebreaksbr }}</tt>
+        </td>
+        <td class="visible">
+          {{testcase.visible}}
+        </td>
+        <td class="hint">
+          {{testcase.hint}}
+        </td>
+        <td class="output">
+          <tt>{{ testcase.output|linebreaksbr }}</tt>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  
+  <h2>Extracted Solution Code [<a id="solution_preview_toggle" href="">Toggle</a>] [<a href="{% url 'cms:admin-cms-task-get-sol' original.id %}">Download</a>]</h2>
+  <div id="solution_preview" style="display:none">
+    <table>
+      <tr class="row1">
+        <td>
+          <textarea style="font-family: monospace"
+            rows="10" cols="80" class="vLargeTextField" readonly>{{ original.solution }}</textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+{% endif %}
+
+</fieldset>
+</div>
+</div>
+
+<script>
+  // added jquery script for toggling various previews.
+
+  var source_changed = false;
+
+  var adjust_iframe_height = function() {
+    var h = $("#preview_frame")[0].contentDocument.height;
+    $("#preview_frame").attr("height",h);
+  };
+
+  var refresh_html = function() {
+    $.post("{% url 'cms:admin-cms-task-preview' %}", 
+           { source: $("#id_source").val(), language: $("#id_language").val() },
+           function(data) {
+             $("#task_preview_notice").show()
+               .animate({opacity: 1.0}, 1500).fadeOut("slow");
+             var html = data.html;
+             var sols = data.sols;
+             //assignment = $("#preview_frame").contents().find("html");
+             assignment = $("#preview_frame").contents().find("#assignment-body");
+             assignment.html(html);
+             for (i in sols)
+             {
+               var blank_id = sols[i][0];
+               var sol = sols[i][1];
+               var pt = sols[i][2];
+               var title = blank_id.substr(1) + " - " + sol + " (" + pt + ")";
+               $(".textblank[name=" + blank_id + "]",assignment).attr("title", title);
+             }
+             $($("#preview_frame")[0].contentDocument).ready(function() {
+               adjust_iframe_height();
+             });
+             $("#task_preview").slideDown("normal");
+             document.getElementById("preview_frame").contentWindow.renderMathJax();
+           }, "json");
+  };
+
+  var register_source_changed_events = function() {
+    $("#id_source").change(function (event) {
+      source_changed = true;
+    });
+
+    $("a#task_test_link").click(function(){
+      {% if original %}
+        if(source_changed) {
+          alert("Source has be changed.  Please save the task before testing");
+          return false;
+        } else {
+          return true;
+        }
+      {% else %}
+        alert("Please save the task before testing");
+        return false;
+      {% endif %}
+    });
+  };
+
+  var add_syntax_help = function() {
+    $("#task_editor").after('<p class="help">Written in Markdown with additional tags.  See <a onclick="return showAddAnotherPopup(this);" href="{% url 'cms:admin-cms-task-help' %}">syntax help</a>.</p>');
+  };
+
+  var register_preview_events = function() {
+    $("#task_preview_toggle").click(function (event) {
+      event.preventDefault();
+      $("#task_preview").slideToggle("normal");
+    });
+
+    $("#task_preview_refresh").click(function (event) {
+      event.preventDefault();
+      refresh_html();
+    });
+  };
+
+  var register_toggle_events_for_saved_task = function() {
+    $("#html_template_preview_toggle").click(function (event) {
+      event.preventDefault();
+      $("#html_template_preview").slideToggle("normal");
+    });
+
+    $("#testcases_preview_toggle").click(function (event) {
+      event.preventDefault();
+      $("#testcases_preview").slideToggle("normal");
+    });
+
+    $("#solution_preview_toggle").click(function (event) {
+      event.preventDefault();
+      $("#solution_preview").slideToggle("normal");
+    });
+  };
+
+  var register_toggle_event_for_supplements = function() {
+    $("#id_supplement_set-TOTAL_FORMS")
+      .parent()
+      .find('fieldset h2')
+      .attr('id','id_supplements_head');
+    $("#id_supplement_set-TOTAL_FORMS")
+      .parent()
+      .find('fieldset table')
+      .wrap('<div id="supplements_view"></div>');
+    $("#supplements_view").hide();
+
+    $("#id_supplements_head").append(' [<a id="supplements_toggle" href="">Toggle</a>]');
+    $("#supplements_toggle").click(function (event) {
+      event.preventDefault();
+      $("#supplements_view").slideToggle("normal");
+    });
+  }
+
+  var add_task_version_display = function() {
+    $(".name > *").prepend('<div style="float:right;">Version: {{ original.version }}</div>')
+  };
+
+  var add_custom_styles = function() { 
+    $("textarea[name='source']").css("font-family","monospace");
+    $("textarea[name='generator']").css("font-family","monospace").attr("rows","2");
+    $("textarea[name='text_grader']").css("font-family","monospace").attr("rows","2");
+  };
+
+  var auto_set_task_owner = function() {
+    var current_owner_id = $("#id_owner").val();
+    if(current_owner_id == "") {
+      $("#id_owner").val({{ user.id }});
+    }
+  };
+  
+  $(document).ready(function(){
+    register_source_changed_events();
+    add_syntax_help();
+    register_preview_events();
+    register_toggle_event_for_supplements();
+    add_custom_styles();
+    $("#preview_frame").on("load",function() {
+      refresh_html();
+    });
+    auto_set_task_owner();
+    {% if original %}
+      add_task_version_display();
+      register_toggle_events_for_saved_task();
+    {% endif %}
+  });
+</script>
+{% endblock %}

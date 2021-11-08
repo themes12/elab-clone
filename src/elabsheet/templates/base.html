@@ -1,0 +1,48 @@
+{% load static site_prefix elab_conf ganalytics %}<!DOCTYPE html>
+<html lang="{{LANGUAGE_CODE}}">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %} | {% site_name %}</title>
+{% block extra-head %}
+{% endblock %}
+<link rel="stylesheet" type="text/css" href="{% static '/css/base.css' %}" />
+{% googleanalyticsjs %}
+</head>
+
+<body>
+    <div id="header">
+        <div class="info">
+          {% block headerbar_info %}{% endblock %}
+          <div id="menu">
+            {% block headerbarmenu %}
+            {% endblock %}
+          </div>
+	</div>
+        <h1>
+            {% block top_title %}
+            <a href="{% site_prefix %}/">{% site_name %}</a>
+            {% endblock %}
+        </h1>
+    </div>
+
+    {% if messages %}
+    <ul class="messagelist">{% for message in messages %}<li>{{ message|escape }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <!-- Content -->
+    <div id="content">
+        {% block pretitle %}{% endblock %}
+        {% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+    </div>
+    <!-- END Content -->
+
+    {% block footer %}<div id="footer"></div>{% endblock %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>

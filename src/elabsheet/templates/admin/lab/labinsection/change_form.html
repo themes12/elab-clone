@@ -1,0 +1,108 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {{ media }}
+{% endblock %}
+
+{% block object-tools %}
+  {{ block.super }}
+  <div class="form-row">
+    <div>
+      <b>Lab:</b> {{original.number}} - {{original.lab}}
+    </div>
+    <div>
+      <b>Course:</b> {{original.section.course}}
+    </div>
+    <div>
+      <b>Section:</b> {{original.section.name}} {{original.section.semester}}
+    </div>
+    <div>
+      <b>Tasks:</b>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Number</th>
+          <th>Task</th>
+          <th></th>
+          <th>Show/Hide</th>
+        </tr>
+        {% for assignment in original.lab.assignment_set.all %}
+        <tr>
+          <td style="text-align:center">{{assignment.id}}</td>
+          <td style="text-align:center">{{assignment.number}}</td>
+          <td>{{assignment.task}}</td>
+          <td>
+            [<a href="{% url 'cms:admin-cms-task-test' assignment.task.id %}" onclick="return showAddAnotherPopup(this);">try</a>]
+          </td>
+          <td style="text-align:center">
+            <button id="toggle-{{assignment.id}}" class="show-hide-toggle" type="button"></button>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <script>
+    if (!$) $ = django.jQuery;
+
+    function set_button_hide(btnObj) {
+      btnObj
+      .css("background-color","rgba(255,0,0,0.3)")
+      .text("Hide");
+    }
+
+    function set_button_show(btnObj) {
+      btnObj
+      .css("background-color","rgba(0,255,0,0.3)")
+      .text("Show");
+    }
+
+    function update_input_text(hidden_tasks) {
+      $("#id_hidden_tasks").val(Array.from(hidden_tasks).join(","));
+    }
+
+    $(document).ready(function() {
+      var all_tasks = new Set([]);
+      {% for assignment in original.lab.assignment_set.all %}
+        all_tasks.add({{assignment.id}});
+      {% endfor %}
+
+      var hidden_tasks = new Set([{{original.hidden_tasks}}])
+
+      // get rid of tasks that no longer exist in the lab
+      hidden_tasks.forEach(function(no) {
+        if (!all_tasks.has(no))
+          hidden_tasks.delete(no);
+      });
+
+      update_input_text(hidden_tasks);
+
+      $('#id_hidden_tasks').prop('readonly', true);
+
+
+      // modify button style to match hidden status
+      set_button_show($(".show-hide-toggle"));
+      hidden_tasks.forEach(function(no) {
+        set_button_hide($("#toggle-" + no));
+      });
+
+      // handle toggle button click
+      $(".show-hide-toggle").on("click",function() {
+        btn_id = $(this).attr("id");
+        no = parseInt(btn_id.split("-")[1]);
+        if (hidden_tasks.has(no)) {
+          set_button_show($(this));
+          hidden_tasks.delete(no);
+        }
+        else {
+          set_button_hide($(this));
+          hidden_tasks.add(no);
+        }
+        update_input_text(hidden_tasks);
+      });
+    });
+  </script>
+{% endblock %}

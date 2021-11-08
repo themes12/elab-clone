@@ -1,0 +1,46 @@
+<fieldset class="module">
+<h2>Results</h2>
+{% block child_search_results %}
+  <!-- To be modified by concrete search result template -->
+{% endblock %}
+</fieldset>
+<script>
+function child_id_from_elt_id(elt_id) {
+  pos = elt_id.lastIndexOf('-');
+  return elt_id.substr(pos+1);
+}
+
+function count_join_model_forms() {
+  return Number($("#id_{{ join_model_name }}_set-TOTAL_FORMS").val());
+}
+
+function increate_join_model_total_form() {
+  count = count_join_model_forms();
+  $("#id_{{ join_model_name }}_set-TOTAL_FORMS").val(count+1);
+}
+
+$(document).ready(function() {
+  $("a.child-adding-link").click(
+    function(event) {
+      event.preventDefault();
+      post_data = { 
+        {{ child_model_name }}_id : child_id_from_elt_id(this.id),
+        form_id: count_join_model_forms()      // id starts at zero
+      };
+      {% if parent_id %}
+        post_data.{{ parent_model_name }}_id = {{ parent_id }};
+      {% endif %}
+      $.post("{% spaceless %}{% block url_for_adding_child %}{% endblock %}{% endspaceless %}",
+             post_data,
+             function(data) {
+               // hide the initial extra empty row (somehow shown by later versions of django)
+               if ($("#{{ join_model_name }}-inline-table tr:last td").eq(1).text().trim() == "")
+                 $("#{{ join_model_name }}-inline-table tr:last").hide();
+
+               $("#{{ join_model_name }}-inline-table").append(data);
+               increate_join_model_total_form();
+             });
+    }
+  );
+});
+</script>

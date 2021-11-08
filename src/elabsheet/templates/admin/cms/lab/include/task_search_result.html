@@ -1,0 +1,35 @@
+{% extends "admin/elabbase/child_search_result.html" %}
+
+{% block child_search_results %}
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="35%">Task</th>
+      <th width="35%">Note</th>
+      <th width="25%">Tags</th>
+      <th width="5%"></th>
+    </tr>
+  </thead>
+  {% if tasks %}
+    {% for task in tasks %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td><a href="{% url 'cms:admin-cms-task-test' task.id %}" onclick="return showAddAnotherPopup(this);">{{ task.name }}</a></td>
+        <td>{{ task.note }}</td>
+        <td>{{ task.tags }}</td>
+        <td>[<a id="task-id-{{ task.id }}" class="child-adding-link" href="">Add</a>]</td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+      <td>Nothing matched</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  {% endif %}
+</table>
+{% endblock child_search_results %}
+
+{% block url_for_adding_child %}
+  {% url 'cms:admin-cms-lab-add-task' %}
+{% endblock %}

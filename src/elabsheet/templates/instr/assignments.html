@@ -1,0 +1,34 @@
+{% extends "lab/base.html" %}
+{% load static %}
+
+{% block title %}Instructor Section Menu{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>Assignment List</h1>
+<ul>
+    {% for labinsection in sec.labinsection_set.all %}
+    <li><b>{{labinsection}}</b>
+    <ul>
+        {% for assignment in labinsection.lab.assignment_set.all %}
+        <li>{{ assignment }}: <br/>
+          <a class="btn btn-outline-info" href="{% url 'instr:view-submissions' sec.id assignment.id %}">view submissions and grade manual fields</a>
+          <a class="btn btn-outline-info regrade-button" href="{% url 'instr:regrade-submissions' sec.id assignment.id %}?next={{request.path}}">regrade</a>
+          <a class="btn btn-outline-info" href="{% url 'instr:zip-submissions' sec.id assignment.id %}">zipped code</a>
+          <a class="btn btn-outline-info" href="{% url 'instr:zip-text-submissions' sec.id assignment.id %}">zipped text answers</a>
+        </li>
+        {% endfor %}
+    </ul>
+    </li>
+
+    {% endfor %}
+</ul>
+<script>
+$("a.regrade-button").click(function() {
+  return confirm("This causes heavy load to the server. Are you sure?");
+});
+</script>
+{% endblock %}

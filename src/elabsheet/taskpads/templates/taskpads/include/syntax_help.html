@@ -1,0 +1,22 @@
+<div id="syntax_help_modal_id" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editor syntax help</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <iframe
+          id="syntax_help_frame_id"
+          style="border: 0px solid lightgray; margin-top: 5px; width: 100%; height: 300px; overflow: hidden scroll;"
+          src="{% url 'cms:admin-cms-task-help' %}">
+        </iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

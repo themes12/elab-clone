@@ -1,0 +1,8 @@
+[program:__ELAB_NAME__]
+
+command = ./home/__ELAB_NAME__/gunicorn-start-elab.sh         ; Command to start app
+user = __ELAB_NAME__                                          ; User to run as
+stdout_logfile = /home/__ELAB_NAME__/logs/elab-supervisor.log ; File to write log messages
+redirect_stderr = true                               ; Save stderr in the same log
+environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8      ; Set UTF-8 as default encoding
+stopasgroup=true                                     ; Stop parent and child processes 

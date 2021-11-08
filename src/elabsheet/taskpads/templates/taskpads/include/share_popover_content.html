@@ -1,0 +1,10 @@
+<div id="share_popover_content_id" class="d-none">
+  <div class="popover-body">
+    สามารถแบ่งปันโจทย์ได้สองรูปแบบ<br />
+    <span class="badge badge-primary">1</span> แบ่งปันโจทย์:<br />
+    <pre class="p-1 bg-light"><a href="{% url 'taskpads:show' task_pad.access_key %}" target="_blank">{{ task_pad.access_key }}</i></a> <a href="{% url 'taskpads:show' task_pad.access_key %}" target="_blank"><i class="fa fa-link"></i></a></pre>
+    <span class="badge badge-primary">2</span> แบ่งปันโจทย์ที่คัดลอกไปใช้ต่อได้ (พร้อมเฉลย):
+    <pre class="p-1 bg-light"><a href="{% url 'taskpads:show' task_pad.access_key %}?sharing={{ task_pad.get_share_key }}" target="_blank">{{ task_pad.access_key }}/?sharing={{ task_pad.get_share_key }}</a> <a href="{% url 'taskpads:show' task_pad.access_key %}?sharing={{ task_pad.get_share_key }}" target="_blank"><i class="fa fa-link"></i></a></pre>
+    <span class="badge badge-danger">ระวัง</span> อย่าให้ลิงก์แบบที่สองกับนักเรียน
+  </div>
+</div>

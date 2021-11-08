@@ -1,0 +1,123 @@
+{% extends "lab/base.html" %}
+
+{% load elab_submission %}
+{% load elab_conf %}
+{% load static %}
+{% load mathjax %}
+
+{% block extra-head %}
+{{block.super}}
+<link type="text/css" rel="stylesheet" href="{% static '/css/css-stars.css' %}" />
+<script type="text/javascript" src="{% static '/js/jquery.barrating.min.js' %}"></script>
+{% mathjax %}
+<script type="text/javascript">
+  lab_id = {{ lab.id }};
+
+  function load_assignment(assignment_id) {
+    $.get(Urls["lab:get-assignment"]({{sec.id}},{{labinsec.id}},assignment_id), 
+          function(data) {
+            $("#assignment").html(data);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"assignment-body"]);
+          });
+  }
+
+  function choose_assignment(assignment_id) {
+    $("#nav-links div.task").removeClass("chosen");
+    $("div#assignment-" + assignment_id).addClass("chosen");
+  }
+
+  function adjust_panels() {
+    var sidebar_width;
+    if ($("#nav-links").is(":visible"))
+      sidebar_width = $("#nav-links").outerWidth();
+    else
+      sidebar_width = 0;
+    var content_width = $(window).width() - sidebar_width;
+    $("#nav-content").width(content_width);
+
+    var toppanel_height = $("#header").height();
+    $("#toggle-sidebar").css("top",toppanel_height);
+  }
+
+  $(document).ready(function() {
+    // add code to each assignment link
+    {% for assignment,submission in assignments %}
+      $("#assignment-{{ assignment.id }}").click(function(event) {
+        event.preventDefault();
+        choose_assignment({{ assignment.id }});
+        load_assignment({{ assignment.id }});
+      });
+    {% endfor %}
+
+    $("#toggle-sidebar").on("click",function() {
+      $("#nav-links").css("opacity",0);
+      $("#nav-links").toggle("slide",function() {
+        $("#nav-links").css("opacity",1);
+        adjust_panels();
+      });
+    });
+
+    adjust_panels();
+    $(window).resize(adjust_panels);
+  });
+</script>
+{% endblock extra-head %}
+
+{% block title %}{{ sec.course.name }} | {{ lab.name }}{% endblock %}
+
+{% block top_title %}
+{{ block.super }}
+| <a href="{% url 'lab:list-labs' sec.id %}">{{ sec.course.name }}</a>
+{% endblock %}
+
+{% block headerbarmenu %}
+[<a href="{% url 'lab:list-labs' sec.id %}">All labs</a>]
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div id="container">
+  <div id="nav-links">
+  {% block contentnav %}
+    <div id="lab-title" style="padding-bottom: 5px; padding-top: 10px;">
+      <div>
+        Lab {{labinsec.number}}:
+      </div>
+      <div>
+        {{ lab.name }}
+        {% if labinsec.read_only %}
+          <span class="label label-warning">read-only</span>
+        {% endif %}
+      </div>
+    </div>
+    {% for assignment,submission in assignments %}
+    <div class="task {% ifequal cur_assignment.id assignment.id %}chosen{% endifequal %}"
+         id="assignment-{{ assignment.id }}">
+      <span style="color:blue">{{ assignment.number }} - {{ assignment.task.name }}</span>
+      <div id="assignment-status-icon-{{ assignment.id }}" style="display: inline">
+        {% include "lab/include/submission_status_icon.html" %}
+      </div>
+    </div>
+    {% endfor %}
+  {% endblock contentnav %}
+  </div>
+
+  <div id="nav-content" style="display: table-cell">
+    <label id="toggle-sidebar" title="Toggle side bar">&lt;|&gt;</label>
+    <div id="assignment">
+      {% if cur_assignment %}
+        {% with assignment=cur_assignment submissions=cur_submissions %}
+          {% include "lab/include/assignment.html" %}
+        {% endwith %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+{{ block.super }}
+<script>
+  all_manual_scores = {{all_manual_scores|safe}};
+</script>
+{% endblock %}
+

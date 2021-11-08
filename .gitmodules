@@ -1,0 +1,9 @@
+[submodule "src/elabsheet"]
+	path = src/elabsheet
+	url = https://gitlab.com/cjaikaeo/elabsheet.git
+[submodule "elab-setup"]
+	path = elab-setup
+	url = https://gitlab.com/cjaikaeo/elab-setup.git
+[submodule "nginx/html/mathjax"]
+	path = nginx/html/mathjax
+	url = https://github.com/mathjax/MathJax.git

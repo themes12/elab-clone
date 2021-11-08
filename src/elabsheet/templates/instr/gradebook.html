@@ -1,0 +1,49 @@
+{% extends "lab/base.html" %}
+
+{% block extra-head %}
+  <style type="text/css">
+      td.std_name
+      {
+          text-align: left;
+          padding-left: 1ex;
+          padding-right: 3ex;
+      }
+  </style>
+{% endblock %}
+
+{% block title %}Gradebook{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>Gradebook</h1>
+<p><a href="{% url 'instr:gradebook-csv' sec.id %}">Export as CSV</a>
+</p>
+<p>
+<table style="text-align: center;" border="1">
+    <tr>
+        <th rowspan="2">Student\Lab</td>
+        {% for labno,labname,auto,manual in labs %}
+        <th colspan="2" title="{{labname}}">{{labno}}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for labno,labname,auto,manual in labs %}
+        <th>Auto ({{auto}})</th><th>Manual ({{manual}})</th>
+        {% endfor %}
+    </tr>
+    {% for std,stats in allstats %}
+    <tr>
+        <td class="std_name" title="{{std.first_name}} {{std.last_name}}">{{std}}</td>
+        {% for auto,manual in stats %}
+        <td>{{auto}}</td>
+        <td>{{manual}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+</p>
+
+{% endblock %}

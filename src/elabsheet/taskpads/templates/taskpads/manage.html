@@ -1,0 +1,116 @@
+{% extends "taskpads/base.html" %}
+
+{% block title %}Taskpad Admin{% endblock %}
+{% block extra-head %}
+<style>
+  table.explained-result {
+    font-size: 80%;
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.explained-result th,
+  table.explained-result tr,
+  table.explained-result td {
+    border: 1px solid grey;
+    text-align: center;
+  }
+  table.explained-result td.input-data,
+  table.explained-result td.hint {
+    text-align: left;
+  }
+  table.explained-result tr.head {
+    background-color: rgba(255,255,0,0.2);
+  }
+
+  table.explained-result tr.even {
+    background-color: rgba(128,128,255,0.1);
+  }
+
+  table.explained-result td.na {
+    background-color: #ccc;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="row" style="margin-bottom: 8px;">
+      <div class="col-md-8">
+        {% if task_pad.task %}
+          <h3>{{ task_pad.task.name }}</h3>
+        {% else %}
+          <h3>ยังไม่ระบุชื่อโจทย์</h3>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        {% with 'manage' as current_page %}
+          {% include "taskpads/include/header_menu.html" %}
+        {% endwith %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3" style="position: sticky; height: calc(100vh - 15rem);">
+        <div id="post_list_group_id" class="list-group">
+          {% for task_post in task_posts %}
+            <a href="#post-item-{{ forloop.counter }}" class="list-group-item list-group-item-action {% if task_post.is_active %}active{% endif %}" data-toggle="list">กลุ่มผู้เรียนที่ {{ forloop.counter }}</a>
+          {% endfor %}
+        </div>
+        
+        <form method="post" action="{% url 'taskpads:newpost' task_pad.access_key task_pad.secret_key %}" class="mt-2">
+          {% csrf_token %}
+          <button class="btn btn-success btn-block">สร้างกลุ่มผู้เรียนใหม่</button>
+        </form>
+      </div>
+      <div class="col-sm-9">
+        <div class="tab-content">
+          {% for task_post in task_posts %}
+            <div class="tab-pane {% if task_post.is_active %}show active{% endif %}" id="post-item-{{ forloop.counter }}">
+              <div style="float: left;">
+                <h4 style="display: inline-block;">กลุ่มผู้เรียนที่ {{ forloop.counter }}</h4>
+                สร้างเมื่อ {{ task_post.created_at|date:'Y-m-d' }} {{ task_post.created_at|time:'H:i:s' }}
+                <a href="{% url 'taskpads:editpost' task_post.key %}" class="btn btn-sm btn-primary">แก้ไข</a>
+                <a href="{% url 'taskpads:post_export_csv' task_post.key %}" class="btn btn-sm btn-info">.csv</a>
+                <a href="{% url 'taskpads:post_export_txt' task_post.key %}" class="btn btn-sm btn-info" target="_blank">.txt</a>
+              </div>
+              <div style="clear: both;"></div>
+
+              {% if task_post.is_active %}
+                {% if messages %}
+                  <ul class="messagelist">
+                    {% for message in messages %}
+                      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endif %}
+              
+              {% include "taskpads/include/task_post_in_manage.html" %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block content_script %}
+  <script>
+    $(function() {
+      $('#share_button_id').popover({
+        trigger: 'focus',
+        html: true,
+        content: function() {
+          return $('#share_popover_content_id').children('.popover-body').html();
+        }
+      });
+
+      var hash = window.location.hash;
+      if (hash) {
+        $('a.list-group-item[href="' + hash + '"]').tab('show');
+      }
+
+      $("a.list-group-item").on("click",function() {
+        window.location.hash = $(this).attr("href");
+      });
+    });
+  </script>
+{% endblock %}

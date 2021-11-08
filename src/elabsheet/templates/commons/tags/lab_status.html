@@ -1,0 +1,20 @@
+<div id="lab-result" style="display: inline;">
+  <div style="float: left; height: 10px; width: 200px;">
+  {% for item,result in status.results %}
+    {% ifequal result "passed" %}
+    <a class="task-status-passed" style="width: {{percent}}%;"
+      href="{% url 'instr:view-assignment-submissions' section.id student.id item.id %}"></a>
+    {% endifequal %}
+    {% ifequal result "failed" %}
+    <a class="task-status-failed" style="width: {{percent}}%;"
+      href="{% url 'instr:view-assignment-submissions' section.id student.id item.id %}"></a>
+    {% endifequal %}
+    {% if not result  %}
+    <div class="task-status-notsubmitted" style="width: {{percent}}%;"></div>
+    {% endif %}
+  {% endfor %}
+  </div>
+  <div style="display: inline;">
+    &nbsp;{{ total }}
+  </div>
+</div>

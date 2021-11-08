@@ -1,0 +1,16 @@
+ตัวอย่าง <a href="#" id="task_preview_id" class="btn btn-sm btn-success"><i class="fas fa-sync-alt"></i></a>
+<span style="display:none;" id="refresh_notice_id">Refreshing...</span>
+<span style="display:none;" id="grading_notice_id">Grading...</span>
+<span style="display:none;" id="grading_results_id"></span>
+<div>
+  <iframe
+    id="preview_frame_id"
+    style="border: 1px solid lightgray; border-radius: 5px; width: 100%; height: 300px;"
+    class="mt-1"
+    src="{% url 'taskpads:preview-iframe' %}">
+  </iframe>
+</div>
+{% if task_pad.task %}
+  <a id="test_task_link_id" href="#" class="btn btn-success">ทดสอบส่ง</a>
+{% endif %}
+<small><span class="text-muted">กรุณาจัดเก็บก่อน เพื่อทดสอบกับการแก้ไขล่าสุด</span></small>

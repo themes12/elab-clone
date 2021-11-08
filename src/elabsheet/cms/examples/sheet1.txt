@@ -1,0 +1,62 @@
+Labsheet No.1
+=============
+This is a sample document for testing e-Labsheet project.
+
+::elab:config lang='python',markers=('{{','}}')
+
+Example
+=======
+<pre class="output">
+Enter a number: _20_
+</pre>
+
+The first code segment:
+::elab:begincode hidden=False,lineno=True
+def hello():
+   print 'Hello, World'
+::elab:endcode
+
+The second code segment:
+::elab:begincode lineno=True,highlight=True
+x = {{raw_input}}('What is your name?')
+print {{'Hello, %s'}} % {{x}}
+sum,prod = 0,1
+for x in range(100):
+   {{sum = sum + x}}
+   {{prod = prod*x}}
+   {{             }}
+{{                          }}
+{{                          }}
+{{                          }}
+{{                         }}
+{{                          }}
+{{                          }}
+{{                          }}
+::elab:endcode
+
+::elab:begintest show=True
+Arthur
+::elab:endtest
+
+::elab:begintest show=True
+Hello, World
+Hi
+::elab:endtest
+
+::elab:begintest
+
+
+
+
+::elab:endtest
+
+Additional Questions
+====================
+Fill in the blanks
+
+
+
+
+* The programming language is called {{[10]Python}}.  It is considered a
+{{[20]dynamically}}-typed {{language}}.
+

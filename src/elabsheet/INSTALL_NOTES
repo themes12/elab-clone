@@ -1,0 +1,25 @@
+Required software
+-----------------
+* To build the box, the 32-bit libraries are required:
+    * sudo apt-get install g++-multilib
+
+
+C# support
+----------
+
+One requirement to run mono that we can't find a way to get around it
+is that the user must have a valid writable home directory.  The mono
+system will write a temp file in ~/.wapi/.  Thus, the box user must
+have valid dir.
+
+
+Java support
+------------
+
+Currently there seems to be some problem with Sun java 6 when running
+under box as a different user with set-uid bit on.  The JVM complains
+that it can't find the required shared library.  Running under normal
+box works fine.
+
+The current box cannot kill java submission.  Another script that
+kills an instance of box is required.

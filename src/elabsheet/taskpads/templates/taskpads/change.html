@@ -1,0 +1,232 @@
+{% extends "taskpads/base.html" %}
+{% load static mathjax %}
+
+{% block title %}Taskpad Admin{% endblock %}
+
+{% block extra-head %}
+  {% mathjax %}
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="container-fluid fullscreen-hide">
+      <div class="row" style="margin-bottom: 8px;">
+        <div class="col-sm-12">
+          <div class="form-row">
+            <div class="col-md-8">
+              {{ form.name.errors }}
+              {{ form.name }}
+            </div>
+            <div class="col-md-4">
+              {% with 'edit' as current_page %}
+                {% include "taskpads/include/header_menu.html" %}
+              {% endwith %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div id="id_task_edit" class="col-sm-6">
+          <div class="form-group fullscreen-hide">
+            {{ form.language.errors }}
+            <div class="row">
+              <div class="col-sm-3 text-right">
+                <label for="{{ form.language.id_for_label }}">ภาษาโปรแกรม</label>
+              </div>
+              <div class="col-sm-9">
+                {{ form.language }}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div style="float:right">
+              <button id="id_button_maximize" class="btn btn-sm btn-outline-secondary fullscreen-hide" type="button">
+                <i class="fa fa-expand-arrows-alt text-secondary"></i>
+              </button>
+              <button id="id_button_restore" class="btn btn-sm btn-outline-secondary fullscreen-show" style="display: none;" type="button">
+                <i class="fa fa-compress text-secondary"></i>
+              </button>
+            </div>
+            {{ form.source.errors }}
+            {{ form.source }}
+          </div>
+          <div style="float:left">
+            <button class="btn btn-primary" type="submit" name="action" value="save">จัดเก็บ</button>
+          </div>
+        </div>
+        
+        <div class="col-sm-6 fullscreen-hide">
+          {% include "taskpads/include/task_preview.html" %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12" style="padding-top:5px">
+          ลิงก์สำหรับแก้ไข (กรุณาจดบันทึก):
+          <input
+            id="taskpad-url"
+            type="text"
+            size="{{url|length}}"
+            value="{{url}}"
+            readonly
+            style="color:grey"
+          >
+          <button class="btn btn-sm btn-light" type="button" id="btn-copy-url" title="Copy to clipboard"><i class="fa fa-copy" style="font-weight:100"></i></button>
+        </div>
+      </div>
+      <hr>
+      {% if task_pad.task.testcases %}
+      <div class="row" id="accordion">
+        <div class="col-sm-12" style="padding-top:5px">
+          <h5 data-toggle="collapse" data-target="#testcases" style="cursor:pointer; color:blue">
+            <i class="fa fa-caret-right"></i> รายการกรณีทดสอบ
+          </h5>
+        </div>
+        <div class="col-sm-12 collapse" style="padding-top:5px" id="testcases">
+          <table class="testcases">
+            <tr class="head">
+              <th style="width:1px; padding:5px;">ลำดับ</th>
+              <th>อินพุท</th>
+              <th>เอาท์พุท</th>
+              <th>เปิดเผยอินพุท</th>
+              <th>คำใบ้</th>
+            </tr>
+            {% for tc in task_pad.task.testcases %}
+            <tr class="{% cycle 'odd' 'even' %}">
+              <td>{{forloop.counter}}</td>
+              <td class="input"><pre>{{tc.input}}</pre></td>
+              <td class="output"><pre>{{tc.output}}</pre></td>
+              <td>
+                {% if tc.visible %}
+                <i class="fa fa-check" style="color:green"></i>
+                {% else %}
+                <i class="fa fa-times" style="color:red"></i>
+                {% endif %}
+              </td>
+              <td class="hint">
+                {% if tc.hint %} {{tc.hint}} {% else %} - {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <h5 style="color:red">ยังไม่มีกรณีทดสอบ</h5>
+      {% endif %}
+    </div>
+  </form>
+
+  {% include 'taskpads/include/syntax_help.html' %}
+{% endblock %}
+{% block content_script %}
+  <script type="text/javascript" src="{% static '/js/jquery-fieldselection.js' %}"></script>
+  <script type="text/javascript" src="{% static '/taskpads/js/taskpadeditor.js' %}"></script>
+  <script>
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var taskModified = false;
+
+    var previewTask = function() {
+      var language = $('#id_language').val();
+      var src = $('#id_source').val();
+      
+      var url = '{% url 'taskpads:preview' %}';
+      
+      $('#refresh_notice_id').show();
+      
+      jQuery.post(url, {
+        language: language,
+        source: src,
+        csrfmiddlewaretoken: csrftoken
+      }, function(data) {
+        var body = $('#preview_frame_id').contents().find('#assignment-body');
+        body.html(data.html);
+        $('#refresh_notice_id').fadeOut();
+        document.getElementById("preview_frame_id").contentWindow.renderMathJax();
+      });
+    };
+
+    var testTask = function() {
+      var data = $('#preview_frame_id').contents().find('#preview_task_form_id').serialize();
+      var url = '{% url 'taskpads:test-task' task_pad.access_key task_pad.secret_key  %}';
+
+      $('#grading_notice_id').show();
+      $('#grading_results_id').hide();
+      jQuery.post(url,
+                  data + "&csrfmiddlewaretoken=" + csrftoken,
+                  function(data) {
+                    $('#grading_notice_id').hide();
+                    $('#grading_results_id').html('Graded: [' + data.results.join('') + ']');
+                    $('#grading_results_id').show();
+                  });
+    };
+    
+    $(function(){
+      $("#preview_frame_id").on("load",function() {
+        previewTask();
+      });
+
+      $('#task_preview_id').click(function() {
+        previewTask();
+        return false;
+      });
+
+      $('#test_task_link_id').click(function() {
+        if(taskModified) {
+          if(!confirm('มีการแก้ไขโจทย์ การทดสอบนี้จะทดสอบกับโจทย์ที่จัดเก็บล่าสุด ถ้าแน่ใจที่จะทดสอบให้กด Ok')) {
+            return false;
+          }
+        }
+        testTask();
+        return false;
+      });
+
+      $('#id_source').change(function(){
+        $('#test_task_link_id').removeClass('btn-success');
+        $('#test_task_link_id').addClass('btn-secondary');
+        taskModified = true;
+      });
+
+      $("#id_editor_button_help").click(function(){
+        $('#syntax_help_frame_id').contents().find('h1').hide();
+        $('#syntax_help_frame_id').contents().find('body').css('width','98%');
+        $('#syntax_help_frame_id').contents().find('body').css('overflow-x','hidden');
+        $('#syntax_help_frame_id').contents().find('#content').css('padding','0');
+        $('#syntax_help_frame_id').contents().find('.form-row').css('width','98%');
+        $('#syntax_help_modal_id').modal('show');
+        return false;
+      });
+
+      $('#share_button_id').popover({
+        //trigger: 'focus',
+        html: true,
+        content: function() {
+          return $('#share_popover_content_id').children('.popover-body').html();
+        }
+      });
+
+      $('#id_button_maximize').click(function() {
+        $(".fullscreen-hide").hide();
+        $(".fullscreen-show").show();
+        $("div#id_task_edit").removeClass('col-sm-6').addClass('col-sm-12');
+        $("textarea#id_source").attr("rows","25");
+      });
+      $('#id_button_restore').click(function() {
+        $(".fullscreen-hide").show();
+        $(".fullscreen-show").hide();
+        $("div#id_task_edit").removeClass('col-sm-12').addClass('col-sm-6');
+        $("textarea#id_source").attr("rows","10");
+      });
+
+      $(".fullscreen-show").hide();
+
+      $("#btn-copy-url").on("click",function() {
+        $("#taskpad-url").select();
+        document.execCommand('copy');
+      });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "taskpads/base_nohead.html" %}
+
+{% load static %}
+{% load elab_conf %}
+{% load mathjax %}
+
+{% block extra-head %}
+  <link rel="stylesheet" type="text/css" href="{% static '/css/base.css' %}" />
+  {% mathjax %}
+{% endblock extra-head %}
+
+{% block content %}
+  <form id="preview_task_form_id">
+    <div id="assignment-body" style="padding: 3px;">
+      Show me the task, with rendered math
+      \[ x^2 + y \]
+    </div>
+  </form>
+{% endblock %}
+
+{% block content_script %}
+  <script>
+    function renderMathJax() {
+      MathJax.Hub.Queue(["Typeset",MathJax.Hub,"assignment-body"]);
+    }
+    renderMathJax();
+  </script>
+{% endblock %}

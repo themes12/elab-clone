@@ -1,0 +1,50 @@
+{% load elab_conf %}
+{% if submissions %}
+  Pick your submission:
+  <select id="old-submission-select">
+    {% for submission in submissions %}
+      <option value="{{ submission.id }}" {% ifequal submission cur_submission %}selected{% endifequal %}>Submitted on {{ submission.submitted_at|date:"G:i d M Y" }}</option>
+    {% endfor %}
+  </select>
+  <div id="old-submission">
+    {% if cur_submission %}
+      {% with cur_submission as submission %}
+        {% include "lab/include/submission_with_copy.html" %}
+      {% endwith %}
+    {% endif %}
+  </div>
+<script>
+  $(document).ready(function(){
+    {% if cur_submission %}
+      bind_copy_current_link("#submission-tabs #old-submission .copy_to_current",
+                             "{{ cur_submission.id }}");
+      MathJax.Hub.Queue(["Typeset",MathJax.Hub,"old-submission"]);
+      ElabClient.create_manual_score_boxes(
+        $("#old-submission"),{readOnly:true});
+      ElabClient.update_manual_score_boxes(
+      $("#old-submission"),{{cur_manual_scores_json|safe}});
+    {% endif %}
+
+    $("#old-submission-select").change(function(event) {
+      //event.preventDefault();
+      var submission_id = $("#old-submission-select").val();
+      $.getJSON(Urls["lab:get-submission"]({{sec.id}},{{assignment.id}},submission_id),
+          function(data) {
+            $("#old-submission").html(data.html);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"old-submission"]);
+            bind_copy_current_link("#submission-tabs #old-submission .copy_to_current",
+                                   submission_id);
+            ElabClient.create_manual_score_boxes(
+              $("#old-submission"),{readOnly:true});
+            ElabClient.update_manual_score_boxes(
+              $("#old-submission"),data.manual_scores);
+          });
+    });
+    {% if labinsec.read_only %}
+      $(".copy_to_current").hide();
+    {% endif %}
+  });
+</script>
+{% else %}
+  No submissions.
+{% endif %}

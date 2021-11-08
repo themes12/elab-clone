@@ -1,0 +1,33 @@
+{% extends "admin/elabbase/change_form_with_search.html" %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static '/js/csrf.js' %}"></script>
+{% endblock %}
+
+{% block child_model_block_inclusion %}
+  {% include "admin/cms/lab/include/assignment_block.html" %}
+{% endblock %}
+
+{% block object-tools %}
+  {{ block.super }}
+  {% if original %}
+  <script>
+    $(document).ready(function(){
+      // added 'Clone / Deep Clone' links
+      $("ul.object-tools").prepend('<li><a id="lab_deep_clone_link" class="addlink" href="{% url 'cms:admin-cms-lab-deep-clone' original.id %}">Deep Clone</a></li>');
+      $("ul.object-tools").prepend('<li><a id="lab_clone_link" class="addlink" href="{% url 'cms:admin-cms-lab-clone' original.id %}">Clone</a></li>');
+
+      // confirmations
+      $("a#lab_clone_link").click(function(){
+        return confirm("This will create a clone of this lab and also UNDO all your current changes.\nAre you sure?");
+      });
+      $("a#lab_deep_clone_link").click(function(){
+        return confirm("This will create a clone of this lab together with clones of all tasks in this lab, and also UNDO all your current changes.\nAre you sure?");
+      });
+    });
+  </script>
+  {% endif %}
+{% endblock %}
+

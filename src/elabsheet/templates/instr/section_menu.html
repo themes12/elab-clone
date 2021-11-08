@@ -1,0 +1,55 @@
+{% extends "lab/base.html" %}
+
+{% load elab_conf %}
+{% load static %}
+
+{% block title %}Instructor Section Menu{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | {{ sec }}
+{% endblock %}
+
+{% block content %}
+<h1>Section Information</h1>
+<ul>
+  <li><a style="font-weight:bold" href="{% url 'admin:lab_section_change' sec.id %}">Manage section</a><br/>
+  Change section name; enroll/unenroll students; add/delete labs; publish announcements
+  </li>
+  <li><a style="font-weight:bold" href="{% url 'instr:lab-options' sec.id %}">Change lab options</a><br/>
+  View/modify each lab's settings such as task hiding and access control
+  </li>
+  <li><a style="font-weight:bold" href="{% url 'instr:list-assignments' sec.id %}">See all assignments</a><br/>
+  View/grade student manual submissions; regrade students' code; download all codes in zip format
+  </li>
+  <li><a style="font-weight:bold" href="{% url 'instr:list-labs' sec.id %}">Lab Status</a><br/>
+  View all student progress in each lab; download detailed CSV report for each lab
+  </li>
+  <li><a style="font-weight:bold" href="{% url 'instr:gradebook' sec.id %}">Student gradebook</a><br/>
+  View/download all students' summarized scores
+  </li>
+  <li><a style="font-weight:bold" href="{% url 'instr:log-report' sec.id %}">Today's logs</a><br/>
+  Returns all logs for this section, starting from yesterday. (Very computationally intensive, please try to use it once a day)
+  </li>
+</ul>
+
+<b>Grader status</b>:
+Current outstanding grading job{{ inqueue_count|pluralize }}: {{ inqueue_count }}
+
+<hr/>
+<h2>Instructor(s)</h2>
+{% for i in sec.instructors.all %}
+    {{i}}
+{% endfor %}
+<hr/>
+<h2>Students</h2>
+    <p>Number of enrolled students: {{ sec.students.count }}</p>
+    <p>
+    <table border="1" cellpadding="3" style="border: 1px solid #C3C3C3; border-collapse: collapse; margin: 5px;">
+        {% for s in sec.students.all %}
+        <tr><td>{{s.username}}</td><td>{{s.first_name}} {{s.last_name}}</td></tr>
+        {% endfor %}
+    </table>
+    </p>
+
+{% endblock %}
+

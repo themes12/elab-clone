@@ -1,0 +1,70 @@
+{% extends "lab/base.html" %}
+
+{% load elab_conf %}
+{% load static %}
+
+{% block title %}Lab Options{% endblock %}
+
+{% block extra-head %}
+<style>
+  div .lab-table {
+    overflow-x: auto;
+    padding: 5px;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #ddd;
+  }
+
+  th {
+    text-align: center;
+    padding: 8px;
+  }
+
+  td {
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:nth-child(even){background-color: #f2f2f2}
+
+  tr.lab:hover {
+    background-color: #ffa;
+  }
+
+</style>
+{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>Lab Options</h1>
+<div class="lab-table">
+  <table>
+    <tr>
+      <th>Number</th><th>Lab</th><th>Settings</th>
+    </tr>
+    {% for ls in sec.labinsection_set.all %}
+    <tr class="lab">
+      <td style="text-align: center">{{ls.number}}</td>
+      <td>{{ls.lab}}</td>
+      <td>
+        <a class="btn btn-outline-primary"
+          href="{% url 'instr:edit-acl' ls.id %}"
+          target="_blank">access control</a>
+        <a class="btn btn-outline-primary"
+          href="{% url 'admin:lab_labinsection_change' ls.id %}"
+          target="_blank">hiding tasks</a>
+        <a class="btn btn-outline-primary"
+          href="{% url 'instr:manage-direct-accounts' sec.id ls.id %}"
+          target="_blank">direct accounts</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
+

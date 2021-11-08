@@ -1,0 +1,49 @@
+{% extends "lab/base.html" %}
+
+{% load elab_submission %}
+
+{% block title %}Listing{% endblock %}
+
+{% block headerbarmenu %}
+[<a href="{% url 'index' %}">Back to Courses</a>]
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h1>{{ sec.course }}</h1>
+<table id="section-lab-list" width="100%">
+  <tbody>
+    <tr>
+      <th width="5%"></th>
+      <th width="50%">Labs</th>
+      <th width="40%">Status</th>
+    </tr>
+    {% for labinsec,status in labs_with_statuses %}
+      <tr>
+        <td>{{ labinsec.number }}</td>
+        <td>
+          {% if labinsec.disabled %}
+            <span style="color:#aaa">{{ labinsec.lab.name }}</span>
+            <span class="label label-danger">disabled</span>
+          {% elif labinsec.direct_to_lab_required %}
+            <span style="color:#aaa">{{ labinsec.lab.name }}</span>
+            <span class="label label-warning">direct account only</span>
+          {% else %}
+            <a href="{% url 'lab:show-lab' sec.id labinsec.id %}">{{ labinsec.lab.name }}</a>
+            {% if labinsec.read_only %}
+            <span class="label label-info">read-only</span>
+            {% endif %}
+          {% endif %}
+        </td>
+        <td>
+          {% if status %}
+            {% lab_status user sec status %}
+            &nbsp;&nbsp;
+            {% lab_manual_status status %}
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

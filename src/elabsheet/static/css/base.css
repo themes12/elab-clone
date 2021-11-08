@@ -1,0 +1,658 @@
+/****************************
+    General components
+****************************/
+h1 { 
+    font-size: 17px;
+    line-height: 100%;
+}
+
+h2 {
+    font-size: 14px;
+}
+
+div {
+    margin: 0;
+}
+
+
+body {
+    padding: 0px;
+    margin: 0px;
+    font-family: "Trebuchet MS",Verdana,sans-serif;
+    font-size: 13px;
+}
+
+body .error {
+    color: #FF0000;
+}
+
+#header { 
+    background: #2F7F2F; 
+    color: #DFDFDF;
+    padding: 1px;
+    padding-left: 5px;
+    height: 35px;
+}
+
+#header a:link, #header a:visited {
+    color: #DFDFDF;
+    text-decoration: none;
+}
+
+#header a:hover {
+    color: #FFFFFF;
+}
+
+#header .info {
+    text-align: right;
+    float: right;
+}
+
+#header .info #welcome {
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+#header .info #welcome b {
+    color: #FFFF70;
+}
+
+#header #menu {
+    color: #FFFFFF;
+    text-align: right;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+#header #menu a:link, #header #menu a:visited {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+#header #menu a:hover {
+    text-decoration: underline;
+}
+
+#container {
+    width: 100%;
+    display: flex;
+}
+
+#nav-links {
+    padding: 5px;
+    width: 200px;
+    vertical-align: top;
+}
+
+#nav-content {
+    width: 100%;
+}
+
+label#toggle-sidebar {
+    position: absolute;
+    left:0px;
+    background: limegreen;
+    border: solid 1px green;
+    color: green;
+    z-index: 2;
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: #3333ff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #3333ff;
+}
+
+.ui-widget-content a {
+    text-decoration: none;
+    color: #3333ff;
+}
+
+.ui-widget-content a:hover {
+    text-decoration: underline;
+}
+
+.ui-widget-content a:visited {
+    text-decoration: none;
+    color: #3333ff;
+}
+
+/* label styles from Bootstrap */
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.label-default { background-color: #777; }
+.label-primary { background-color: #337ab7; }
+.label-success { background-color: #5cb85c; }
+.label-info    { background-color: #5bc0de; }
+.label-warning { background-color: #f0ad4e; }
+.label-danger  { background-color: #d9534f; }
+
+a.btn {
+    text-decoration: none;
+}
+
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    padding: 1px 5px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.btn:hover {
+    color: black;
+}
+
+.btn-default { color: #333; background-color: #fff;    border-color: #ccc; }
+.btn-primary { color: #fff; background-color: #337ab7; border-color: #2e6da4; }
+.btn-success { color: #fff; background-color: #5cb85c; border-color: #4cae4c; }
+.btn-info    { color: #fff; background-color: #5bc0de; border-color: #46b8da; }
+.btn-warning { color: #fff; background-color: #f0ad4e; border-color: #eea236; }
+.btn-danger  { color: #fff; background-color: #d9534f; border-color: #d43f3a; }
+a:visited.btn-default { color: #333; }
+a:visited.btn-primary { color: #fff; }
+a:visited.btn-success { color: #fff; }
+a:visited.btn-info    { color: #fff; }
+a:visited.btn-warning { color: #fff; }
+a:visited.btn-danger  { color: #fff; }
+
+.btn-outline-default { color: #6c757d; background-color: transparent; border-color: #6c757d; }
+.btn-outline-primary { color: #007bff; background-color: transparent; border-color: #007bff; }
+.btn-outline-success { color: #28a745; background-color: transparent; border-color: #28a745; }
+.btn-outline-info    { color: #17a2b8; background-color: transparent; border-color: #17a2b8; }
+.btn-outline-warning { color: #ffc107; background-color: transparent; border-color: #ffc107; }
+.btn-outline-danger  { color: #dc3545; background-color: transparent; border-color: #dc3545; }
+a:visited.btn-outline-default { color: #6c757d; }
+a:visited.btn-outline-primary { color: #007bff; }
+a:visited.btn-outline-success { color: #28a745; }
+a:visited.btn-outline-info    { color: #17a2b8; }
+a:visited.btn-outline-warning { color: #ffc107; }
+a:visited.btn-outline-danger  { color: #dc3545; }
+
+.btn.disabled {
+    pointer-events: none;
+    cursor: default;
+    opacity: 0.2;
+}
+
+/****************************
+      First page
+****************************/
+
+#first-page h1 {
+    padding: 5px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+#first-page ul.section-list {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#first-page ul.section-list li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    padding-bottom: 7px;
+}
+
+#first-page .section-link {
+    background: #f0f0f0;
+    font-weight: bold;
+    font-size: 110%;
+    line-height: 100%;
+    border: 1px solid gray;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+#first-page .section-link a {
+    color: #505050;
+    display: block;
+    padding: 5px;
+    outline-style: none;
+}
+
+#first-page .section-link a:link, #first-page .section-link a:visited {
+    color: #505050;
+    text-decoration: none;
+}
+
+#first-page .section-link a:hover {
+    text-decoration: none;
+    background: yellow;
+    color: #202020;
+}
+
+#first-page .announcement {
+    margin: 10px;
+    border: 2px solid green;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    padding: 0px;
+}
+
+#first-page .announcement .title {
+    background: green;
+    font-weight: bold;
+    color: white;
+    padding: 2px;
+    padding-left: 5px;
+}
+
+#first-page .announcement .body {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/****************************
+          Lab List
+****************************/
+
+table#section-lab-list {
+    text-align: left;
+}
+
+/****************************
+     Assignment List
+****************************/
+#lab-title {
+    font-weight: bold;
+}
+
+#assignment-title {
+    background: #C2E27E;
+    color: #303030;
+    padding-left: 5px;
+    font-weight: bold;
+    font-size: 120%;
+    height: 25px;
+}
+
+#assignment-body {
+    margin: 5px;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+#nav-links div.task {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: 2px;
+    margin-bottom:2px;
+}
+
+#nav-links div.task:hover {
+    background: rgba(255,255,0,0.1);
+    cursor: pointer;
+}
+
+#nav-links div.chosen {
+    border: 1px solid black;
+    background: rgba(255,255,0,0.1);
+}
+
+#recent-submission {
+    margin: 5px;
+    padding: 2px;
+    border: 1px grey solid;
+    background: #eeffee;
+}
+
+#recent-submission-status {
+    padding: 2px;
+    padding-left: 5px;
+}
+
+.compiler-message-view {
+    margin: 2px;
+    background: #e0e0d0;
+    font-size: 90%;
+    padding: 5px;
+    border: 1px solid gray;
+    overflow: auto;
+}
+
+.submission-view {
+    margin: 2px;
+    background: #f0f0b0;
+    font-size: 90%;
+    padding: 5px;
+    border: 1px solid gray;
+    overflow: auto;
+}
+
+.submission-status {
+    margin: 2px;
+    background: white;
+    font-size: 90%;
+    padding: 2px;
+    border: 1px solid gray;
+}
+
+#assignment #current, #assignment #recent, #assignment #all {
+    padding: 5px;
+}
+
+#submission-tabs li.ui-tabs-tab a.ui-tabs-anchor {
+    padding: 0.2em 1em;
+    font-size: 90%;
+}
+
+#submission-tabs .ui-tabs-nav {
+    padding: 0.1em 0.1em 0;
+}
+
+#submission-tabs .ui-corner-all {
+    -moz-border-radius-bottomleft: 0;
+    -moz-border-radius-bottomright: 0;
+}
+
+/****************************
+     Submission List
+****************************/
+table.submission-list {
+    border-collapse: collapse;
+    width: 95%;
+}
+
+table.submission-list tr.odd {
+    border: 1px solid gray;
+    background: #ddffdd;
+}
+
+table.submission-list tr.even {
+    border: 1px solid gray;
+    background: #ddddff;
+}
+
+table.submission-list tr.selected {
+    border: 1px solid gray;
+    background: #ffffff;
+    color: #000000;
+    font-weight: bold;
+}
+
+
+/****************************
+     Task components
+****************************/
+code .codeblank {
+   border-width: 1px;
+   border-color: #0000ff;
+   background-color: #ffff88;
+   color: #0000aa;
+   font-family: monospace;
+   ! important;
+}
+
+code {
+   font-family: monospace;
+   ! important;
+}
+
+code span.lineno {
+  color: #ff99ff;
+}
+
+.textblank {
+   border-width: 1px;
+   border-color: #0000ff;
+   background-color: #88ffff;
+   color: #0000aa;
+   ! important;
+}
+
+textarea.textblank, input[type="text"].textblank {
+   font-family: monospace;
+}
+
+pre {
+   font-family: "Consolas", "Lucida Console", Monaco, monospace;
+}
+
+pre.output {
+   margin: 10px;
+   padding: 5px;
+   background-color: rgba(128,128,128,0.1);
+   width: 80%;
+   border:1px dashed grey;
+}
+
+pre.output em {
+   font-weight: bold;
+   font-style: normal;
+   text-decoration: underline;
+   color: #cc0000;
+}
+
+elab-embed {
+   color: red;
+   display: inline-block;
+   border: 1px solid red;
+   padding: 3px;
+   border-radius: 3px;
+   background: rgba(255,0,0,0.1);
+}
+
+/****************************
+      Styles from IDLEX
+****************************/
+pre.output span.COMMENT {color: #aaa;}
+pre.output span.KEYWORD {color: #ff7700;}
+pre.output span.BUILTIN {color: #900090;}
+pre.output span.STRING {color: #00aa00;}
+pre.output span.DEFINITION {color: #0000ff;}
+pre.output span.ERROR {color: #000000;}
+pre.output span.hit {color: #ffffff;}
+pre.output span.stdout {color: blue;}
+pre.output span.stderr {color: red;}
+pre.output span.console {color: #770000;}
+pre.output span.findsel {color: #000000;}
+
+.code-menu {
+    font-size: 10px;
+    text-align: right;
+}
+
+.code-menu a:link, .code-menu a:visited {
+    color: #a0a0a0;
+    text-decoration: none;
+}
+
+.code-menu a:hover {
+    color: #505050;
+}
+
+form.grading
+{
+  border: 1px solid gray;
+  margin: 5px;
+  padding: 5px;
+  display: none;
+}
+
+input.scorebox
+{
+  /* position: relative; bottom: 8px; */
+  background-color: #ffaaaa;
+  color: #ff0000;
+  font-weight: bold;
+  border: 1px solid red;
+  ! important;
+}
+
+/*
+.ui-tabs .ui-tabs-hide {
+    display: none;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    border-bottom:0 none !important;
+    float:left;
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    margin:0 0.2em -1px 0;
+    padding:0;
+}
+
+.ui-helper-clearfix {
+    display: block;
+}
+*/
+
+/****************************
+     Syntax highlighting
+****************************/
+body .hll { background-color: #ffffcc }
+body .c { color: #408080; font-style: italic } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #008000; font-weight: bold } /* Keyword */
+body .o { color: #666666 } /* Operator */
+body .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+body .cp { color: #BC7A00 } /* Comment.Preproc */
+body .cpf { color: #408080 } /* Comment.PreprocFile */
+body .c1 { color: #408080; font-style: italic } /* Comment.Single */
+body .cs { color: #408080; font-style: italic } /* Comment.Special */
+body .gd { color: #A00000 } /* Generic.Deleted */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gr { color: #FF0000 } /* Generic.Error */
+body .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+body .gi { color: #00A000 } /* Generic.Inserted */
+body .go { color: #808080 } /* Generic.Output */
+body .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+body .gt { color: #0040D0 } /* Generic.Traceback */
+body .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+body .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+body .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+body .kp { color: #008000 } /* Keyword.Pseudo */
+body .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+body .kt { color: #B00040 } /* Keyword.Type */
+body .m { color: #666666 } /* Literal.Number */
+body .s { color: #BA2121 } /* Literal.String */
+body .na { color: #7D9029 } /* Name.Attribute */
+body .nb { color: #008000 } /* Name.Builtin */
+body .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+body .no { color: #880000 } /* Name.Constant */
+body .nd { color: #AA22FF } /* Name.Decorator */
+body .ni { color: #999999; font-weight: bold } /* Name.Entity */
+body .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+body .nf { color: #0000FF } /* Name.Function */
+body .nl { color: #A0A000 } /* Name.Label */
+body .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+body .nt { color: #008000; font-weight: bold } /* Name.Tag */
+body .nv { color: #19177C } /* Name.Variable */
+body .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+body .w { color: #bbbbbb } /* Text.Whitespace */
+body .mf { color: #666666 } /* Literal.Number.Float */
+body .mh { color: #666666 } /* Literal.Number.Hex */
+body .mi { color: #666666 } /* Literal.Number.Integer */
+body .mo { color: #666666 } /* Literal.Number.Oct */
+body .sb { color: #BA2121 } /* Literal.String.Backtick */
+body .sc { color: #BA2121 } /* Literal.String.Char */
+body .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+body .s2 { color: #BA2121 } /* Literal.String.Double */
+body .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+body .sh { color: #BA2121 } /* Literal.String.Heredoc */
+body .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+body .sx { color: #008000 } /* Literal.String.Other */
+body .sr { color: #BB6688 } /* Literal.String.Regex */
+body .s1 { color: #BA2121 } /* Literal.String.Single */
+body .ss { color: #19177C } /* Literal.String.Symbol */
+body .bp { color: #008000 } /* Name.Builtin.Pseudo */
+body .vc { color: #19177C } /* Name.Variable.Class */
+body .vg { color: #19177C } /* Name.Variable.Global */
+body .vi { color: #19177C } /* Name.Variable.Instance */
+body .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+/****************************
+          Lab Status
+****************************/
+
+.task-status-passed {
+    float: left;
+    height: 10px;
+    background: green;
+    border: 1px solid white;
+    margin: -1px;
+}
+
+.task-status-failed {
+    float: left;
+    height: 10px;
+    background: red;
+    border: 1px solid white;
+    margin: -1px;
+}
+
+.task-status-notsubmitted {
+    float: left;
+    height: 10px;
+    background: #eeeeee;
+    border: 1px solid white;
+    margin: -1px;
+}
+
+table.explained-result {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.explained-result th,
+table.explained-result tr,
+table.explained-result td {
+    border: 1px solid grey;
+    text-align: center;
+}
+
+table.explained-result td.input-data,
+table.explained-result td.hint
+{
+    text-align: left;
+}
+
+table.explained-result tr.head {
+    background-color: rgba(255,255,0,0.2);
+}
+
+table.explained-result tr.even {
+    background-color: rgba(128,128,255,0.1);
+}
+
+table.explained-result td.na {
+    background-color: #ccc;
+}

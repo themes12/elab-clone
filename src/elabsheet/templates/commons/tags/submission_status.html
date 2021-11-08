@@ -1,0 +1,20 @@
+{% load static %}
+{% if submission %}
+  {% if submission.graded %}
+    {% if submission.passed %}
+      PASSED<img src="{% static '/images/16-em-check.png' %}"/>
+    {% else %}
+      FAILED<img src="{% static '/images/16-em-cross.png' %}"/>
+    {% endif %} 
+  {% else %}
+    <img src="{% static '/images/16-clock.png' %}"/> in queue 
+  {% endif %}
+  {% block submission_result_details %}{% endblock %}
+  {% if submission.assignment.task.has_manual_grading %}
+    || Manual <img src="{% static '/images/16-member.png' %}"/>:
+    {{ submission.sum_manual_scores }}/{{ submission.assignment.task.manual_full_score }}    
+    {% if not submission.manual_grading_completed %}
+      <span style="color:brown">(incomplete)</span>
+    {% endif %}
+  {% endif %}
+{% endif %}

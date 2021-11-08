@@ -1,0 +1,24 @@
+{% load elab_submission %}
+<div id="id_submission_status_{{ submission.id }}" class="submission-status ui-corner-all">
+  Submitted on {{ submission.submitted_at|date:"G:i d M Y" }} || 
+  Result: {% sub_status_detailed submission %}
+  {% if submission.compiler_messages %}<button class="compiler-messages">View compiler messages</button>{% endif %}
+  {% block extra_submission_status %}{% endblock %}
+</div>
+{% if submission.compiler_messages %}
+  <div class="compiler-message-view" style="display: none;">
+    {{ submission.compiler_messages|linebreaksbr }}
+  </div>
+{% endif %}
+<div id="id_submission_{{ submission.id }}" class="submission-view" style="clear: both;">
+  {{ submission.html }}
+</div>
+<script>
+  $(document).ready(function() {
+    $(".compiler-messages").click(function() {
+      $(this.parentNode.parentNode)
+        .find(".compiler-message-view")
+        .toggle();
+    });
+  });
+</script>

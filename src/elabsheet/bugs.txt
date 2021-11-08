@@ -1,0 +1,5 @@
+Known bugs that have not been fixed
+===================================
+- Grader will crash when supplementary file is not found.
+- Worker won't kill itself when task generator or manual grader is stuck in an
+  infinite loop.  Generators and manual graders should run inside a sandbox.

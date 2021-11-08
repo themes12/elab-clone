@@ -1,0 +1,30 @@
+{% load i18n %}
+<fieldset class="module">
+   <h2>Labs</h2>
+   {{ inline_admin_formset.formset.management_form }}
+   {{ inline_admin_formset.formset.non_form_errors }}
+   <table id="labincourse-inline-table">
+     <thead><tr>
+       <th width="10%">Number</th>
+       <th>Lab</th>
+       {% if inline_admin_formset.formset.can_delete %}<th width="10%">{% trans "Delete?" %}</th>{% endif %}
+     </tr></thead>
+   
+     {% for inline_admin_form in inline_admin_formset %}
+        {% if inline_admin_form.form.non_field_errors %}
+          <tr><td colspan="3">
+	    {{ inline_admin_form.form.non_field_errors }}
+          </td></tr>
+        {% endif %}
+
+	{% with inline_admin_formset.formset.can_delete as can_delete %}
+
+  	  {% include "admin/cms/course/include/labincourse_inline_oneform.html" %}
+
+	{% endwith %}
+
+     {% endfor %}
+   
+   </table>
+   
+</fieldset>

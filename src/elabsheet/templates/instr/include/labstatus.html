@@ -1,0 +1,18 @@
+{% load elab_submission %}
+{% load elab_conf %}
+<table style="text-align: left;">
+    <tr>
+        <th width="30%">Student</th>
+        <th width="50%">Status</th>
+    </tr>
+    {% for std,status in all_status %}
+    <tr>
+        <td>{{std.first_name}} {{std.last_name}} ({{std.username}})</td>
+        <td>
+            {% lab_status std section status %}
+            &nbsp;&nbsp;
+            {% lab_manual_status status %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

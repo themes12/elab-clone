@@ -1,0 +1,86 @@
+{% extends "lab/base.html" %}
+
+{% block title %}Listing{% endblock %}
+
+{% block content %}
+<div id="first-page">
+  {% if teaches_active or teaches_inactive %}
+    {% if svn_revision %}
+      <div style="float:right">
+        (Revision: {{ svn_revision }})
+      </div>
+    {% endif %}
+    <h1 style="color:brown">Teach</h1>
+    <ul class="section-list">
+      {% for sec in teaches_active %}
+      <li>
+      <div class="section-link" style="background:rgba(255,150,0,0.15)">
+        <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+      </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if teaches_inactive %}
+    <button class="toggle-inactive-sections" style="margin-left:5px; margin-bottom:5px;">Show/Hide Inactive Sections</button>
+    <div id="inactive-teaches" style="display:none">
+      <ul class="section-list">
+        {% for sec in teaches_inactive %}
+        <li>
+        <div class="section-link" style="background:rgba(255,150,0,0.1); border: 1px solid lightgrey">
+          <a href="{% url 'instr:section-menu' sec.id %}" style="color:#888888">{{ sec }}</a>
+        </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <h1 style="color:darkblue">Learn</h1>
+  <ul class="section-list">
+    {% for sec in learns_active %}
+    <li>
+    <div class="section-link" style="background:rgba(0,0,255,0.15)">
+      <a href="{% url 'lab:list-labs' sec.id %}">{{ sec }}</a>
+    </div>
+    {% if sec.published_announcements %}
+      {% load markdown_filter %}
+      {% for a in sec.published_announcements %}
+      <div class="announcement">
+        <div class="title">{{ a.title }}</div>
+        <div class="body">
+          {{ a.body|markdown|safe }}
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+    </li>
+    {% empty %}
+      <i>You currently have no class to learn.</i>
+    {% endfor %}
+  </ul>
+  <button class="toggle-inactive-sections" style="margin-left:5px; margin-bottom:5px;">Show/Hide Inactive Sections</button>
+  <div id="inactive-learns" style="display:none">
+    <ul class="section-list">
+      {% for sec in learns_inactive %}
+      <li>
+        <div class="section-link" style="background:rgba(0,0,255,0.1); border: 1px solid lightgrey">
+          <a href="{% url 'lab:list-labs' sec.id %}" style="color:#888888">{{ sec }}</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+  $(document).ready(function() {
+    $(".toggle-inactive-sections").click(function() {
+      event.preventDefault();
+      $(this).next("div").slideToggle("normal");
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "taskpads/base.html" %}
+
+{% block title %}Your Taskpad{% endblock %}
+
+{% block content %}
+  Your task pads:
+  <ul>
+    {% for task_pad in task_pads %}
+      <li>
+        {% if task_pad.task %}
+          {{ task_pad.task }}
+          [<a href="{% url 'taskpads:show' task_pad.access_key %}">View</a>]
+        {% else %}
+          empty task
+        {% endif %}
+        [<a href="{% url 'taskpads:change' task_pad.access_key task_pad.secret_key %}">Edit</a>]
+      </li>
+    {% empty %}
+      <li>
+        You have no task pads.
+      </li>
+    {% endfor %}
+  </ul>
+
+  Create <a href="{% url 'taskpads:new' %}">new task pad</a>.
+{% endblock %}

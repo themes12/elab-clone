@@ -1,0 +1,141 @@
+{% load elab_submission %}
+{% load elab_conf %}
+<div id="assignment-title" style="padding-top: 15px">
+  {{ assignment }} 
+</div>
+<div id="recent-submission-status-{{ assignment.id }}">
+  {% if recent_submission %}
+    {% include "lab/include/recent_submission_status_short.html" %}
+  {% endif %}
+</div>
+<div id="submission-tabs">
+  <ul>
+    <li><a href="#current"><span>Current</span></a></li>
+    <li><a href="#recent-{{ assignment.id }}"><span>Recent</span></a></li>
+    <li><a href="{% url 'lab:get-all-submissions' sec.id assignment.id %}"><span>All</span></a></li>
+  </ul>
+  <div id="current">
+    <form method="post" action="{% url 'lab:submit-assignment' sec.id labinsec.id assignment.id %}" enctype="multipart/form-data">
+      <div id="assignment-body">
+        {% csrf_token %}
+        {{ assignment.html }} 
+      </div>
+      {% if not labinsec.read_only or da_submission_allowed %}
+        <input type="submit" value="Submit"/>
+      {% endif %}
+      {% if is_instructor %}
+        <a href="{% url 'admin:cms_task_change' assignment.task.id %}"
+           class="btn btn-outline-primary"
+           target="_blank">view task in admin</a>
+        {% if assignment.task.cache %}
+          <a href="{% url 'admin:cms_cachedchildtask_change' assignment.task.cache.id %}"
+             class="btn btn-outline-primary"
+             target="_blank">view cached task</a>
+        {% endif %}
+      {% endif %}
+    </form>
+  </div>
+  <div id="recent-{{ assignment.id }}" class="recent">
+    {% if recent_submission %}
+      {% with recent_submission as submission %}
+        {% include "lab/include/submission_with_copy.html" %}
+      {% endwith %}
+    {% else %}
+      No submissions.
+    {% endif %}
+  </div>
+  <div id="all">
+  </div>
+</div>
+<script>
+  function copy_submission_to_current(submission_id) {
+    $.getJSON(Urls["lab:copy-submission"](submission_id), 
+      function(items) {
+        for(var i=0; i<items.length; i++) {
+          // blanks can be either input or textarea
+          $("#assignment-body input[name=" + items[i].name + "]")
+            .val(items[i].value); 
+          $("#assignment-body textarea[name=" + items[i].name + "]")
+            .val(items[i].value); 
+        }
+        $("#submission-tabs").tabs({active:0});
+      });
+  }
+
+  function bind_copy_current_link(link_query, submission_id) {
+    $(link_query).click(function (event) {
+      event.preventDefault();
+      copy_submission_to_current(submission_id);
+    });
+  }
+
+  function refresh_grading_status(assignment_id, submission_id) {
+    $.getJSON(Urls["lab:get-submission-status"](submission_id), 
+      function(data) {
+        if(data.graded) {
+          if($("#recent-"+assignment_id).length!=0) {
+            $("#recent-submission-status-" + assignment_id).html(data.assignment_status);
+            $("#recent-" + assignment_id).html(data.submission);
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"recent-"+assignment_id]);
+
+            bind_copy_current_link("#submission-tabs #recent-" + assignment_id + " .copy_to_current", submission_id);
+	    
+          }
+          $("#assignment-status-icon-" + assignment_id).html(data.icon);
+
+          // Recreate manual score boxes (as they were overwritten by the
+          // above html() call), then update the scores
+          ElabClient.create_manual_score_boxes(
+            $("#recent-" + assignment_id),{readOnly:true});
+          ElabClient.update_manual_score_boxes(
+            $("#recent-" + assignment_id),data.manual_scores);
+        } else {
+          if($("#recent-"+assignment_id).length!=0)
+            // refresh only when the scheduled assignment is the current one
+            schedule_refresh(assignment_id, submission_id);
+        }
+      });
+  }
+
+  function schedule_refresh(assignment_id, submission_id) {
+    setTimeout(function () {
+        refresh_grading_status(assignment_id, submission_id);
+    }, 3000);
+  }
+
+  function add_code_menu() {
+    $("code.source").before('<div class="code-menu"><a href="#" class="lineno-toggle">[hide line #]</a></div>');
+    $(".lineno-toggle").click(function() {
+      $(this.parentNode.parentNode).find(".lineno").toggle();
+      if(this.innerHTML=='[hide line #]')
+        this.innerHTML = '[show line #]';
+      else
+        this.innerHTML = '[hide line #]';
+    });
+  }				    
+
+  $(document).ready(function() {
+    $("#submission-tabs").tabs({ spinner: ''});
+    add_code_menu();
+
+    {% if recent_submission %}
+      bind_copy_current_link("#submission-tabs #recent-{{ assignment.id }} .copy_to_current",
+                             "{{ recent_submission.id }}");
+      var $recent = $("div#recent-{{assignment.id}}");
+      ElabClient.create_manual_score_boxes($recent,{readOnly:true});
+
+      {% if recent_submission.graded %}
+        ElabClient.update_manual_score_boxes(
+          $recent,all_manual_scores[{{recent_submission.id}}]);
+      {% else %}
+        schedule_refresh({{ assignment.id }}, {{ recent_submission.id }});
+      {% endif %}
+    {% endif %}
+    $(".codeblank").attr("autocomplete","off");
+    $("form").attr("autocomplete","off");
+    {% if labinsec.read_only %}
+      $(".copy_to_current").hide();
+    {% endif %}
+    ElabClient.render_components({{assignment.task.id}},{{labinsec.id}});
+  });
+</script>

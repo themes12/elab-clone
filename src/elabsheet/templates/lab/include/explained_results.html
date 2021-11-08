@@ -1,0 +1,39 @@
+{% load static %}
+<div>
+  <table class="explained-result">
+    <tr class="head">
+      <th style="width:1px; padding:5px;">Test&nbsp;#</th>
+      <th style="width:1px; padding:5px;">Result</th>
+      <th style="width:1px; padding:5px;">Meaning</th>
+      <th>Input</th>
+      <th>Hint</th>
+    </tr>
+    {% for test,result in results %}
+    <tr class="{% cycle 'odd' 'even' %}">
+      <td>{{forloop.counter}}</td>
+      <td>{{result}}</td>
+      <td>{{result.meaning}}</td>
+      {% if test.visible %}
+      <td class="input-data">
+        <pre>{{test.input}}</pre>
+      </td>
+      {% else %}
+      <td class="na">
+        <!--
+        <img src="{% static '/images/16-circle-minus.png' %}" title="Not available">
+        -->
+      </td>
+      {% endif %}
+      {% if test.hint %}
+      <td class="hint">{{test.hint}}</td>
+      {% else %}
+      <td class="na">
+        <!--
+        <img src="{% static '/images/16-circle-minus.png' %}" title="Not available">
+        -->
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>

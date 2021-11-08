@@ -1,0 +1,42 @@
+{% extends "admin/elabbase/change_form_with_search_2div.html" %}
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static '/js/reverse.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static '/css/elab_admin.css' %}" />
+  <script>
+    function adjust_width() {
+      var w = $("#course_form").width();
+      $("#content-main-right").width((w-20)*0.5);
+      $("#content-main-left").width((w-20)*0.5);
+    }
+   
+    function add_link_to_labs() {
+      $("#labincourse-inline-table tbody tr").each(function(i,r) {
+        var cell = r.children[1];
+        var input = cell.children[0];
+        var labId = input.value;
+
+        // make sure the [edit] link is not added to the empty line (possibly
+        // caused by new versions of django)
+        if (labId != "") {
+          var lablink = Urls["admin:cms_lab_change"](labId);
+          $(cell).append("[<a " +
+            "href='" + lablink + "' " +
+            "target='_blank'>edit</a>]");
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      adjust_width();
+      add_link_to_labs();
+      $(window).resize(adjust_width);
+    });
+  </script>
+{% endblock %}
+
+{% block child_model_block_inclusion %}
+  {% include "admin/cms/course/include/labincourse_block.html" %}
+{% endblock %}

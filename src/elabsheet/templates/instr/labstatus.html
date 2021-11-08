@@ -1,0 +1,74 @@
+{% extends "lab/base.html" %}
+{% load static %}
+{% load elab_conf %}
+
+{% block extra-head %}
+  {{block.super}}
+  <style type="text/css">
+      .status
+      {
+          border: 1px solid gray;
+          margin: 5px;
+          padding: 5px;
+          display: none;
+      }
+  </style>
+{% endblock %}
+
+{% block title %}Lab Status{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>Lab Status</h1>
+{% for lab in sec.labinsection_set.all %}
+<ul>
+    <li>{{lab}} 
+    <a class="toggle btn btn-outline-info" href="{% url 'instr:lab-status' lab.id %}">toggle</a>
+    <a class="refresh btn btn-outline-info" href="{% url 'instr:lab-status' lab.id %}">refresh</a>
+    <a class="btn btn-outline-info" href="{% url 'instr:lab-status-report' lab.id %}">detailed report in csv</a>
+    <div class="status"></div>
+    </li>
+</ul>
+{% endfor %}
+{% endblock %}
+
+{% block footer %}
+<script>
+  this.load_status = function($lab,$target)
+  {
+    $target.html("Loading...");
+    $.get($lab.attr('href'), function(data)
+    {
+      $target.html(data);
+    });
+  }
+
+  $(document).ready(function()
+  {
+    $("a.toggle").click(function(event) 
+    {
+      event.preventDefault();
+      $lab = $(this);
+      $target = $lab.nextAll("div.status");
+      if ($target.is(":hidden"))
+      {
+        $target.show();
+        load_status($lab,$target)
+      }
+      else
+        $target.hide();
+    });
+
+    $("a.refresh").click(function(event) 
+    {
+      event.preventDefault();
+      $lab = $(this);
+      $target = $lab.nextAll("div.status");
+      load_status($lab,$target);
+    });
+  });
+</script>
+{% endblock %}

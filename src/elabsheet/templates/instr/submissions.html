@@ -1,0 +1,112 @@
+{% extends "lab/base.html" %}
+{% load static %}
+{% load elab_conf %}
+{% load elab_submission %}
+{% load mathjax %}
+
+{% block extra-head %}
+  {{block.super}}
+  {% mathjax %}
+{% endblock %}
+
+{% block title %}View/Grade Recent Submissions{% endblock %}
+
+{% block top_title %}
+{{ block.super }} | <a href="{% url 'instr:section-menu' sec.id %}">{{ sec }}</a>
+{% endblock %}
+
+{% block content %}
+<h1>View/Grade Recent Submissions</h1>
+<p><a href="{% url 'instr:list-assignments' sec.id %}">All Assignments</a></p>
+<b>Assignment:</b>
+<a href="{% url 'admin:cms_lab_change' assignment.lab.id %}" target="_blank">{{assignment.lab}}</a>
+&rarr;
+<a href="{% url 'admin:cms_task_change' assignment.task.id %}" target="_blank">{{assignment.task}}</a>
+<button id="show-all-button">แสดงงานทั้งหมด</button>
+<input type="checkbox" id="auto-hide-checkbox" checked/>ซ่อนอัตโนมัติหลัง save<br/>
+<b>Number of submitted assignments:</b> {{submissions|length}} out of
+{{sec.students.all|length}} student(s)<br/>
+<ul>
+{% for std,submission in submissions %}
+    {% if submission %}
+    <li><a class="std_id" id="{{std.username}}" href="">
+        {{std.first_name}} {{std.last_name}} ({{std}})</a>
+      <a class="btn btn-outline-info" href="{% url 'instr:view-assignment-submissions' sec.id std.id assignment.id %}" target="_blank">view all submissions</a>
+      {% if submission.assignment.task.cache %}
+      <a class="btn btn-outline-info"
+        href="{% url 'admin:cms_cachedchildtask_change' submission.assignment.task.cache.id %}"
+        target="_blank">view cached task</a>
+      {% endif %}
+      <br/>
+        Submitted at {{submission.submitted_at|date:"M d Y G:i:s"}}
+            from {{submission.remote_addr}}.
+            Result:
+            <span class="grading-status">
+              {% include "lab/include/grading-status.html" %}
+            </span>
+    <form class="grading" method="post" action="{% url 'instr:grade-submission' submission.id %}">
+      <div class="submission" id="std-{{std.username}}">
+          {{submission.html}}
+      </div>
+      <input type="submit" value="Save" />
+    </form>
+    </li>
+    <br/>
+    {% endif %}
+{% endfor %}
+</ul>
+{% endblock %}
+
+{% block footer %}
+<script>
+  $(document).ready(function()
+  {
+    // prevent editable blanks in submission
+    // note that this should be done before score textboxes are added
+    $(".submission input").attr("readOnly",true);
+    $(".submission textarea").attr("readOnly",true);
+
+    // toggle student submission when the student name is clicked
+    $("a.std_id").click(function(event)
+    {
+      event.preventDefault();
+      $(this).nextAll(".grading").slideToggle("normal");
+    });
+
+    // add a score box after each text blank
+    ElabClient.create_manual_score_boxes($(document));
+
+    // Compute total score when a form is submitted
+    $("form.grading").submit(function(event)
+    {
+      event.preventDefault();
+      $form = $(this);
+      $.post($form.attr("action"), $form.serialize(), function(data)
+      {
+        if (data.error)
+          alert("Entered score is invalid or out of range");
+        else {
+          if($("#auto-hide-checkbox").prop("checked"))
+            $form.slideUp("normal");
+        }
+        $("span.grading-status",$form.parent()).html(data.grading_status_html);
+        ElabClient.update_manual_score_boxes($form,data.scores);
+      }, "json");
+    });
+
+    // Add blanks' solutions as tooltips (for manual grading)
+    {% for blank in task.textblank_set.all %}
+      $("[name=b{{blank.blank_id}}]").attr("title","{{blank.solution_for_js|safe}} ({{blank.score}} pts)")
+    {% endfor %}
+
+    // Update score boxes with current scores
+    var scores = {{json_scores|safe}}
+    for (var sid in scores) {
+      ElabClient.update_manual_score_boxes($("div.submission#std-" + sid),scores[sid]);
+    }
+    $("#show-all-button").click(function () {
+      $(".grading").show();
+    });
+  });
+</script>
+{% endblock %}
